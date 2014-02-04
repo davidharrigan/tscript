@@ -1,0 +1,1 @@
+java -ea -cp "$TS_ROOT/build/packages:$TS_ROOT/build/lib/antlr.jar" ts.Main $@

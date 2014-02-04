@@ -1,0 +1,57 @@
+<head>
+<title> AST for exp.ts</title>
+</head>
+<body>
+<pre>
+Program
+  PrintStatement
+    ADD
+      NumericLiteral 1.0
+      MULTIPLY
+        NumericLiteral 2.0
+        NumericLiteral 3.0
+  PrintStatement
+    ADD
+      MULTIPLY
+        NumericLiteral 3.0
+        NumericLiteral 2.0
+      NumericLiteral 1.0
+  PrintStatement
+    MULTIPLY
+      ADD
+        NumericLiteral 1.0
+        NumericLiteral 2.0
+      NumericLiteral 3.0
+  PrintStatement
+    ADD
+      ADD
+        NumericLiteral 1.0
+        NumericLiteral 2.0
+      NumericLiteral 3.0
+  PrintStatement
+    MULTIPLY
+      MULTIPLY
+        NumericLiteral 2.0
+        NumericLiteral 3.0
+      NumericLiteral 4.0
+  Var abc
+  Var def
+  PrintStatement
+    ASSIGN
+      Identifier abc
+      ASSIGN
+        Identifier def
+        NumericLiteral 42.0
+  PrintStatement
+    ADD
+      Identifier abc
+      Identifier def
+  PrintStatement
+    ASSIGN
+      Identifier abc
+      ADD
+        NumericLiteral 1.0
+        MULTIPLY
+          NumericLiteral 2.0
+          NumericLiteral 3.0
+</pre>
