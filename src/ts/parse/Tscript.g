@@ -84,8 +84,8 @@ expression
 
 assignmentExpression
   returns [ Expression lval ]
-  : a=additiveExpression
-    { $lval = $a.lval; }
+  : e=equalityExpression
+    { $lval = $e.lval; }
   | l=leftHandSideExpression EQUAL r=assignmentExpression
     { checkAssignmentDestination(loc($start), $l.lval);
       $lval = buildBinaryOperator(loc($start), Binop.ASSIGN,
@@ -128,6 +128,25 @@ primaryExpression
     { $lval = $e.lval; }
   ;
 
+relationalExpression
+  returns [ Expression lval ]
+  : a=additiveExpression
+    { $lval = $a.lval; }
+  | l=relationalExpression LESS r=additiveExpression
+    { $lval = buildBinaryOperator(loc($start), Binop.LESS, $l.lval, $r.lval); }
+  | l=relationalExpression GREATER r=additiveExpression
+    { $lval = buildBinaryOperator(loc($start), Binop.GREATER, $l.lval, $r.lval); }
+  ;
+
+equalityExpression
+  returns [ Expression lval ]
+  : re=relationalExpression
+    { $lval = $re.lval; }
+  | l=equalityExpression DOUBLE_EQUAL r=relationalExpression
+    { $lval = buildBinaryOperator(loc($start), Binop.EQUAL, $l.lval, $r.lval); }
+  ;
+
+
 // fragments to support the lexer rules
 
 fragment DIGIT : [0-9];
@@ -156,6 +175,12 @@ SEMICOLON : [;];
 EQUAL : [=];
 PLUS : [+];
 ASTERISK : [*];
+
+DOUBLE_EQUAL : [=][=];
+LESS : [<];
+GREATER : [>];
+NOT : [!];
+NOT_EQUAL : [!=];
 
 // keywords start here
 PRINT : 'print';

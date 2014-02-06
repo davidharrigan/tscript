@@ -90,6 +90,45 @@ public abstract class TSValue
     return rightValue;
   }
 
+  /** Perform an equal comparison. "this" is the left operand and the right 
+   *  operand is given by the parameter.
+   */
+  public final TSBoolean isEqual(final TSValue right) 
+  {
+    TSPrimitive leftValue = this.toPrimitive();
+    TSPrimitive rightValue = right.toPrimitive();
+
+    return TSBoolean.create(leftValue.toNumber().getInternal() == 
+      rightValue.toNumber().getInternal());
+  }
+
+  /** Perform a less than comparison. "this" is the left operand and the right 
+   *  operand is given by the parameter.
+   */
+  public final TSBoolean isLess(final TSValue right) 
+  {
+    TSPrimitive leftValue = this.toPrimitive();
+    TSPrimitive rightValue = right.toPrimitive();
+
+    return TSBoolean.create(leftValue.toNumber().getInternal() <
+      rightValue.toNumber().getInternal());
+  }
+
+  /** Perform a greater than comparison. "this" is the left operand and the right 
+   *  operand is given by the parameter.
+   */
+  public final TSBoolean isGreater(final TSValue right) 
+  {
+    TSPrimitive leftValue = this.toPrimitive();
+    TSPrimitive rightValue = right.toPrimitive();
+
+    System.out.println(leftValue.toNumber().getInternal());
+    System.out.println(rightValue.toNumber().getInternal());
+    return TSBoolean.create(leftValue.toNumber().getInternal() >
+      rightValue.toNumber().getInternal());
+  }
+
+
   //
   // test for null and undefined
   //

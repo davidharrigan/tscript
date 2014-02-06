@@ -70,6 +70,18 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
     {
       left.setValue(left.getValue().simpleAssignment(right.getValue()));
     }
+    else if (binaryOperator.getOp() == Binop.EQUAL) 
+    {
+      left.setValue(left.getValue().isEqual(right.getValue()));
+    }
+    else if (binaryOperator.getOp() == Binop.LESS)
+    {
+      left.setValue(left.getValue().isLess(right.getValue()));
+    }
+    else if (binaryOperator.getOp() == Binop.GREATER) 
+    {
+      left.setValue(left.getValue().isGreater(right.getValue()));
+    }
     else
     {
       assert false : "unexpected binary operator";
