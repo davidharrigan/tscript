@@ -51,6 +51,16 @@ public abstract class TSValue
     return prim.toStr();
   }
 
+  //
+  //
+  //
+  public final TSBoolean not()
+  {
+    TSPrimitive leftValue = this.toPrimitive();
+    if (leftValue.toNumber().getInternal() != 0)
+      return TSBoolean.create(false);
+    return TSBoolean.create(true);
+  }
 
   //
   // binary operators (sections 11.5-11.11)
@@ -67,6 +77,19 @@ public abstract class TSValue
     return TSNumber.create(leftValue.getInternal() * rightValue.getInternal());
   }
   
+  /** Perform a division. "this" is the left operand and the right
+   *  operand is given by the parameter. Both operands are converted
+   *  to Number before the addition.
+   */
+  public final TSPrimitive divide(final TSValue right)
+  {
+    TSPrimitive leftValue = this.toPrimitive();
+    TSPrimitive rightValue = right.toPrimitive();
+
+    return TSNumber.create(leftValue.toNumber().getInternal() /
+      rightValue.toNumber().getInternal());
+  }
+
   /** Perform an addition. "this" is the left operand and the right
    *  operand is given by the parameter. Both operands are converted
    *  to Number before the addition.
@@ -80,6 +103,19 @@ public abstract class TSValue
       rightValue.toNumber().getInternal());
   }
   
+  /** Perform an subtraction. "this" is the left operand and the right
+   *  operand is given by the parameter. Both operands are converted
+   *  to Number before the addition.
+   */
+  public final TSPrimitive subtract(final TSValue right)
+  {
+    TSPrimitive leftValue = this.toPrimitive();
+    TSPrimitive rightValue = right.toPrimitive();
+
+    return TSNumber.create(leftValue.toNumber().getInternal() -
+      rightValue.toNumber().getInternal());
+  }
+
   /** Perform an assignment. "this" is the left operand and the right
    *  operand is given by the parameter.
    */

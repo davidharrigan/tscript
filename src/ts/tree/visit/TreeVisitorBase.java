@@ -40,6 +40,12 @@ public class TreeVisitorBase<T> implements TreeVisitor<T>
     return null;
   }
 
+  public T visit(final UnaryOperator unaryOperator)
+  {
+    visitNode(unaryOperator.getLeft());
+    return null;
+  }
+
   public T visit(final ExpressionStatement expressionStatement)
   {
     visitNode(expressionStatement.getExp());

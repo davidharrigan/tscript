@@ -105,14 +105,20 @@ additiveExpression
   | l=additiveExpression PLUS r=multiplicativeExpression
     { $lval = buildBinaryOperator(loc($start), Binop.ADD,
         $l.lval, $r.lval); }
+  | l=additiveExpression MINUS r=multiplicativeExpression
+    { $lval = buildBinaryOperator(loc($start), Binop.SUBTRACT,
+        $l.lval, $r.lval); }
   ;
 
 multiplicativeExpression
   returns [ Expression lval ]
-  : p=primaryExpression
+  : p=unaryExpression
     { $lval = $p.lval; }
   | l=multiplicativeExpression ASTERISK r=primaryExpression
     { $lval = buildBinaryOperator(loc($start), Binop.MULTIPLY,
+      $l.lval, $r.lval); }
+  | l=multiplicativeExpression DASH r=primaryExpression
+    { $lval = buildBinaryOperator(loc($start), Binop.DIVIDE, 
       $l.lval, $r.lval); }
   ;
 
@@ -146,6 +152,14 @@ equalityExpression
     { $lval = buildBinaryOperator(loc($start), Binop.EQUAL, $l.lval, $r.lval); }
   ;
 
+unaryExpression
+  returns [ Expression lval ]
+  : le=leftHandSideExpression
+    { $lval = $le.lval; }
+  | NOT u=unaryExpression
+    { $lval = buildUnaryOperator(loc($start), Uop.NOT, $u.lval); }
+  ;
+
 
 // fragments to support the lexer rules
 
@@ -174,7 +188,9 @@ RPAREN : [)];
 SEMICOLON : [;];
 EQUAL : [=];
 PLUS : [+];
+MINUS : [-];
 ASTERISK : [*];
+DASH : [/];
 
 DOUBLE_EQUAL : [=][=];
 LESS : [<];

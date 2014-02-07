@@ -45,6 +45,25 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
     return ret;
   }
   
+  public TSCompletion visit(final UnaryOperator unaryOperator)
+  {
+    TSCompletion left = visitNode(unaryOperator.getLeft());
+    if (!left.isNormal())
+    {
+      return left;
+    }
+
+    Message.setLocation(unaryOperator.getLoc());
+    if (unaryOperator.getOp() == Uop.NOT) 
+    {
+      left.setValue(left.getValue().not());
+    }
+    else {
+      assert false : "unexpected unary operator";
+    }
+    return left;
+  }
+
   public TSCompletion visit(final BinaryOperator binaryOperator)
   {
     TSCompletion left = visitNode(binaryOperator.getLeft());
@@ -62,9 +81,17 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
     {
       left.setValue(left.getValue().add(right.getValue()));
     }
+    else if (binaryOperator.getOp() == Binop.SUBTRACT)
+    {
+      left.setValue(left.getValue().subtract(right.getValue()));
+    }
     else if (binaryOperator.getOp() == Binop.MULTIPLY)
     {
       left.setValue(left.getValue().multiply(right.getValue()));
+    }
+    else if (binaryOperator.getOp() == Binop.DIVIDE)
+    {
+      left.setValue(left.getValue().divide(right.getValue()));
     }
     else if (binaryOperator.getOp() == Binop.ASSIGN)
     {
