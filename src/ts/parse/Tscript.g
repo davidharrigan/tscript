@@ -158,6 +158,8 @@ unaryExpression
     { $lval = $le.lval; }
   | NOT u=unaryExpression
     { $lval = buildUnaryOperator(loc($start), Uop.NOT, $u.lval); }
+  | MINUS u=unaryExpression
+    { $lval = buildUnaryOperator(loc($start), Uop.MINUS, $u.lval); }
   ;
 
 
@@ -182,6 +184,7 @@ fragment FALSE: 'false';
 //   keywords must appear before IDENTIFIER
 
 NUMERIC_LITERAL : DIGIT+;
+BOOLEAN_LITERAL : TRUE | FALSE;
 
 LPAREN : [(];
 RPAREN : [)];
@@ -196,20 +199,14 @@ DOUBLE_EQUAL : [=][=];
 LESS : [<];
 GREATER : [>];
 NOT : [!];
-NOT_EQUAL : [!=];
+NOT_EQUAL : [!][=];
 
 // keywords start here
 PRINT : 'print';
 VAR : 'var';
 
-// boolean literals
-BOOLEAN_LITERAL
-: TRUE
-| FALSE;
-
 IDENTIFIER : IdentifierCharacters;
 
 // skip whitespace and comments
-
 WhiteSpace : SpaceTokens+ -> skip;
 

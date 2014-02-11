@@ -2,5 +2,5 @@
 
 # translate and execute a Tscript program
 #
-TS_ROOT="/home/david/Code/CS/cs712/tscript"
+TS_ROOT="/home/david/Code/tscript"
 java -ea -cp "$TS_ROOT/build/packages:$TS_ROOT/build/lib/antlr.jar" ts.Main $@

@@ -58,6 +58,10 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
     {
       left.setValue(left.getValue().not());
     }
+    else if (unaryOperator.getOp() == Uop.MINUS)
+    {
+      left.setValue(left.getValue().unaryMinus());
+    }
     else {
       assert false : "unexpected unary operator";
     }

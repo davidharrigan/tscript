@@ -62,6 +62,12 @@ public abstract class TSValue
     return TSBoolean.create(true);
   }
 
+  public final TSNumber unaryMinus() 
+  {
+    TSNumber leftValue = this.toNumber(); 
+    return TSNumber.create(leftValue.getInternal() * -1.0);
+  }
+
   //
   // binary operators (sections 11.5-11.11)
   //
