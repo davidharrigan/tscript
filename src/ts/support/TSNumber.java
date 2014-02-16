@@ -49,6 +49,12 @@ public final class TSNumber extends TSPrimitive
     return this;
   }
 
+  /** Convert to a Boolean **/
+  public TSBoolean toBoolean() 
+  {
+    return (this.value == 0) ? TSBoolean.create(false) : TSBoolean.create(true); 
+  }
+
   /** Convert Number to String
    * (<a href="http://www.ecma-international.org/ecma-262/5.1/#sec-9.8.1">ELS
    * 9.8.1</a>)

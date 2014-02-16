@@ -2,7 +2,7 @@
 // test precedence and associativity of operators
 //
 
-print 1+2*3;
+print 1 + 0x02 * 3;
 print 3*2+1;
 print (1+2)*3;
 print 1+2+3;

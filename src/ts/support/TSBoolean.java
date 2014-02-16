@@ -26,16 +26,24 @@ public final class TSBoolean extends TSPrimitive  {
 	}
 
 	/** Convert to a Number, either 1 or 0 */
-	public TSNumber toNumber() {
+	public TSNumber toNumber() 
+	{
 		if (value == false)
 			return TSNumber.create(0.0);
 		return TSNumber.create(1.0);
 	}
 
 	/** Convert Boolean to String */
-	public TSString toStr() {
+	public TSString toStr() 
+	{
 		if (value == false)
 			return TSString.create("false");
 		return TSString.create("true");
+	}
+
+	/** Convert to Boolean, so nothing to do */
+	public TSBoolean toBoolean() 
+	{
+		return this;
 	}
 }

@@ -59,6 +59,12 @@ abstract class TSReference extends TSValue
     return this.getValue().toStr();
   }
 
+  /** Get value from reference and convert it to boolean type */
+  public final TSBoolean toBoolean() 
+  {
+    return this.getValue().toBoolean();
+  }
+
   /** Get value from reference and see if it is undefined. */
   public final boolean isUndefined()
   {

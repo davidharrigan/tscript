@@ -41,6 +41,7 @@ public abstract class TSValue
   }
 
   abstract public TSNumber toNumber();
+  abstract public TSBoolean toBoolean();
 
   /** Convert to String. Override for all primitive types and TSReference.
    *  It can't be called toString because of Object.toString.
@@ -140,6 +141,7 @@ public abstract class TSValue
     TSPrimitive leftValue = this.toPrimitive();
     TSPrimitive rightValue = right.toPrimitive();
 
+    abstractEqualityComparison(this, right);
     return TSBoolean.create(leftValue.toNumber().getInternal() == 
       rightValue.toNumber().getInternal());
   }
@@ -183,5 +185,21 @@ public abstract class TSValue
     return false;
   }
 
+  /** Perform an abstract equality comparison. 
+   * 
+   */
+  private boolean abstractEqualityComparison(TSValue left, TSValue right) {
+    if (left.getClass() == right.getClass())
+    {
+      if (left.isUndefined())
+        return true; 
+      if (left.getClass() == TSNull)
+        return true;
+      if (left.getClass() == TSNumber)
+      {
+        
+      }
+    }
+  }
 }
 

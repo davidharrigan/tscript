@@ -55,5 +55,17 @@ public final class TSString extends TSPrimitive
     assert false : "not implemented";
     return null;
   }
+
+  /** Convert to string. So nothing to do */
+  public TSString toStr() 
+  {
+    return this;
+  }
+
+  /** Convert to a Boolean */
+  public TSBoolean toBoolean() 
+  {
+    return (this.value == "") ? TSBoolean.create(false) : TSBoolean.create(true);
+  }
 }
 

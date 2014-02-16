@@ -79,6 +79,17 @@ public class TreeBuilder
     return new Identifier(loc, name);
   }
 
+  /** Build a null literal expression. Converts the String for the 
+      value to a null
+
+      @param loc    location in source code (file, line, column)
+  */
+  public static Expression buildNullLiteral(final Location loc)
+  {
+    Message.log("TreeBuilder: NullLiteral");
+    return new NullLiteral(loc, null);
+  }
+
   /** Build a numeric literal expression. Converts the String for
    *  the value to a double.
    *
@@ -90,16 +101,40 @@ public class TreeBuilder
   {
     double d = 0.0;
 
-    try
-    {
-      d = Double.parseDouble(value);
+    if (value.length() > 2 && (value.substring(0,2).equals("0x") || value.substring(0,2).equals("0X"))) {
+        try 
+        {
+          d = (double)Long.parseLong(value.substring(3), 16);
+        }
+        catch(NumberFormatException nfe)
+        {
+          Message.bug(loc, "numeric literal not parsable ");
+        }
     }
-    catch(NumberFormatException nfe)
+    else 
     {
-      Message.bug(loc, "numeric literal not parsable");
+      try
+      {
+        d = Double.parseDouble(value);
+      }
+      catch(NumberFormatException nfe)
+      {
+          Message.bug(loc, "numeric literal not parsable " );  
+      }
     }
     Message.log("TreeBuilder: NumericLiteral " + d);
     return new NumericLiteral(loc, d);
+  }
+
+  /**
+   *
+   */
+  public static Expression buildStringLiteral(final Location loc, 
+    final String value) 
+  {
+    String s = value;
+    Message.log("TreeBuilder: StringLiteral " + s);
+    return new StringLiteral(loc, s);
   }
 
   /** 

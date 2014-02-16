@@ -25,5 +25,9 @@ public interface TreeVisitor<T>
   T visit(VarStatement varStatement);
 
   T visit(BooleanLiteral booleanLiteral);
+
+  T visit(StringLiteral stringLiteral);
+
+  T visit(NullLiteral nullLiteral);
 }
 

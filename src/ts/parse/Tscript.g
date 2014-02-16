@@ -128,8 +128,12 @@ primaryExpression
     { $lval = buildIdentifier(loc($start), $IDENTIFIER.text); }
   | NUMERIC_LITERAL
     { $lval = buildNumericLiteral(loc($start), $NUMERIC_LITERAL.text); }
+  | STRING_LITERAL 
+    { $lval = buildStringLiteral(loc($start), $STRING_LITERAL.text); }
   | BOOLEAN_LITERAL
     { $lval = buildBooleanLiteral(loc($start), $BOOLEAN_LITERAL.text); }
+  | NULL_LITERAL 
+    { $lval = buildNullLiteral(loc($start)); }
   | LPAREN e=expression RPAREN
     { $lval = $e.lval; }
   ;
@@ -165,8 +169,6 @@ unaryExpression
 
 // fragments to support the lexer rules
 
-fragment DIGIT : [0-9];
-
 fragment IdentifierCharacters : [a-zA-Z_$] [a-zA-Z0-9_$]*;
 
 fragment SpaceTokens : SpaceChars | LineTerminator | EndOfLineComment;
@@ -177,14 +179,124 @@ fragment EndOfLineComment : '//' ( ~[\n\r] )* (LineTerminator | EOF);
 
 fragment LineTerminator : '\r' '\n' | '\r' | '\n';
 
+// Numeric -----------------------------------------------------------
+//
+
+fragment DecimalDigit : [0-9];
+
+fragment HexDigit : [0-9] | [a-f] | [A-F];
+
+fragment DecimalLiteral
+  : DecimalDigit+ '.' DecimalDigit* ExponentPart?
+  | '.' DecimalDigit+ ExponentPart?
+  | DecimalDigit+ ExponentPart?
+  ;
+
+fragment ExponentPart
+  : ExponentIndicator SignedInteger
+  ;
+
+fragment ExponentIndicator
+  : 'e' 
+  | 'E'
+  ;
+
+fragment SignedInteger
+  : DecimalDigit
+  | ('+' | '-') DecimalDigit
+  ;
+
+fragment HexIntegerLiteral
+  : '0' ('x' | 'X') HexDigit+;
+
+// String -------------------------------------------------------------
+//
+fragment DoubleStringCharacters 
+  : DoubleStringCharacter 
+  | DoubleStringCharacter DoubleStringCharacters
+  ;
+
+fragment SingleStringCharacters
+  : SingleStringCharacter
+  | SingleStringCharacter SingleStringCharacters
+  ;
+
+fragment DoubleStringCharacter 
+  : ~["\\\n]
+  | '\\' EscapeSequence
+  ;
+
+fragment SingleStringCharacter 
+  : ~['\\\n']
+  | '\\' EscapeSequence
+  ;
+
+fragment LineContinuation 
+  : '\\' LineTerminator
+  ;
+
+fragment EscapeSequence 
+  : CharacterEscapeSequence
+  | '0'
+  // | HexEscapeSequence
+  ;
+
+fragment CharacterEscapeSequence 
+  : 'SingleEscapeCharacter'
+  | 'NonEscapeCharacter'
+  ;
+
+fragment SingleEscapeCharacter 
+  :  '\'' 
+  | '"' 
+  | '\\' 
+  | 'b' 
+  | 'f' 
+  | 'n' 
+  | 'r' 
+  | 't' 
+  | 'v' 
+  ;
+
+fragment NonEscapeCharacter 
+  : ~[\'"\\bfnrtv\n]
+  ;
+
+fragment EscapeCharacter 
+  : SingleEscapeCharacter 
+ // | DecimalDigit
+  | 'x'
+  | 'u'
+  ;
+
+//fragment HexEscapeSequence 
+// : 'x' HexDigit HexDigit
+// ;
+
 fragment TRUE: 'true';
 fragment FALSE: 'false';
 
 // lexer rules
 //   keywords must appear before IDENTIFIER
 
-NUMERIC_LITERAL : DIGIT+;
-BOOLEAN_LITERAL : TRUE | FALSE;
+NUMERIC_LITERAL 
+  : DecimalLiteral
+  | HexIntegerLiteral
+  ;
+
+BOOLEAN_LITERAL 
+  : TRUE 
+  | FALSE
+  ;
+
+STRING_LITERAL 
+  : '"' DoubleStringCharacters* '"'
+  | '\'' SingleStringCharacters* '\''
+  ;
+
+NULL_LITERAL 
+  : 'null'
+  ;
 
 LPAREN : [(];
 RPAREN : [)];
