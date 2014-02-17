@@ -52,8 +52,32 @@ public final class TSString extends TSPrimitive
   /** Convert String to Number. Not yet Implemented. */
   public TSNumber toNumber()
   {
-    assert false : "not implemented";
-    return null;
+    double d = 0.0;
+    String value = this.value.replace(" ", "");
+    value.replace("\\n", "");
+
+    if (value.length() > 2 && (value.substring(0,2).equals("0x") || value.substring(0,2).equals("0X"))) {
+        try 
+        {
+          d = (double)Long.parseLong(value.substring(2), 16);
+        }
+        catch(NumberFormatException nfe)
+        {
+         ; 
+        }
+    }
+    else 
+    {
+      try
+      {
+        d = Double.parseDouble(value);
+      }
+      catch(NumberFormatException nfe)
+      {
+        ;
+      }
+    }
+    return TSNumber.create(d);
   }
 
   /** Convert to string. So nothing to do */

@@ -104,7 +104,7 @@ public class TreeBuilder
     if (value.length() > 2 && (value.substring(0,2).equals("0x") || value.substring(0,2).equals("0X"))) {
         try 
         {
-          d = (double)Long.parseLong(value.substring(3), 16);
+          d = (double)Long.parseLong(value.substring(2), 16);
         }
         catch(NumberFormatException nfe)
         {
@@ -132,7 +132,8 @@ public class TreeBuilder
   public static Expression buildStringLiteral(final Location loc, 
     final String value) 
   {
-    String s = value;
+    String s = value.substring(1, value.length()-1);
+    s = s.replace("\\n", "\n");
     Message.log("TreeBuilder: StringLiteral " + s);
     return new StringLiteral(loc, s);
   }
@@ -145,10 +146,7 @@ public class TreeBuilder
   {
     boolean b; 
     char first = Character.toUpperCase(value.charAt(0));
-    String new_value = first + value.substring(1);
-
-    //TODO: handle numerical value 0, look in the doc for other cases
-    
+    String new_value = first + value.substring(1);    
       b = Boolean.parseBoolean(new_value);
       return new BooleanLiteral(loc, b);
   }

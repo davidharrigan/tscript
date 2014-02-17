@@ -29,7 +29,7 @@ public final class TSBoolean extends TSPrimitive  {
 	public TSNumber toNumber() 
 	{
 		if (value == false)
-			return TSNumber.create(0.0);
+			return TSNumber.create(+0.0);
 		return TSNumber.create(1.0);
 	}
 

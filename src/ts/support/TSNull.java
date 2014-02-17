@@ -24,13 +24,13 @@ public final class TSNull extends TSPrimitive
 	/** Convert to number */
 	public TSNumber toNumber() 
 	{
-		return TSNumber.zeroValue;
+		return TSNumber.create(+0.0);
 	}
 
 	/** Convert to boolean */
 	public TSBoolean toBoolean() 
 	{
-		return TSBoolean.falseValue;
+		return TSBoolean.create(false);
 	}
 
 	/** Conver to string */

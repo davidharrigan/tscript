@@ -58,10 +58,36 @@ statement
     { $lval = $p.lval; }
   ;
 
+// Variable Statement ---------------------------------------------------------
+//
 varStatement
   returns [ Statement lval ]
-  : VAR IDENTIFIER SEMICOLON
+  : VAR v=variableDeclarationList SEMICOLON
+  { $lval = $v.lval; }
+  //: VAR IDENTIFIER SEMICOLON
+  //  { $lval = buildVarStatement(loc($start), $IDENTIFIER.text); }
+  ;
+
+variableDeclarationList
+  returns [ Statement lval ]
+  : v=variableDeclaration
+    { $lval = $v.lval; }
+  | variableDeclarationList COMMA v=variableDeclaration
+    { $lval = $v.lval; }
+  ;
+
+variableDeclaration
+  returns [ Statement lval ]
+  : IDENTIFIER
     { $lval = buildVarStatement(loc($start), $IDENTIFIER.text); }
+  | IDENTIFIER i=initialiser
+    { $lval = buildVarStatement(loc($start), $IDENTIFIER.text); }
+  ;
+
+initialiser
+  returns [ Statement lval ]
+  : EQUAL a=assignmentExpression 
+    { $lval = buildExpressionStatement(loc($start), $a.lval); } 
   ;
 
 expressionStatement
@@ -202,8 +228,8 @@ fragment ExponentIndicator
   ;
 
 fragment SignedInteger
-  : DecimalDigit
-  | ('+' | '-') DecimalDigit
+  : DecimalDigit+
+  | ('+' | '-') DecimalDigit+
   ;
 
 fragment HexIntegerLiteral
@@ -222,12 +248,12 @@ fragment SingleStringCharacters
   ;
 
 fragment DoubleStringCharacter 
-  : ~["\\\n]
+  : ~('"' | '\\' | '\n')
   | '\\' EscapeSequence
   ;
 
 fragment SingleStringCharacter 
-  : ~['\\\n']
+  : ~('\'' | '\\' | '\n')
   | '\\' EscapeSequence
   ;
 
@@ -242,12 +268,12 @@ fragment EscapeSequence
   ;
 
 fragment CharacterEscapeSequence 
-  : 'SingleEscapeCharacter'
-  | 'NonEscapeCharacter'
+  : SingleEscapeCharacter
+  | NonEscapeCharacter
   ;
 
 fragment SingleEscapeCharacter 
-  :  '\'' 
+  : '\'' 
   | '"' 
   | '\\' 
   | 'b' 
@@ -264,14 +290,13 @@ fragment NonEscapeCharacter
 
 fragment EscapeCharacter 
   : SingleEscapeCharacter 
- // | DecimalDigit
+  | DecimalDigit
   | 'x'
-  | 'u'
   ;
 
-//fragment HexEscapeSequence 
-// : 'x' HexDigit HexDigit
-// ;
+fragment HexEscapeSequence 
+  : 'x' HexDigit HexDigit
+  ;
 
 fragment TRUE: 'true';
 fragment FALSE: 'false';
@@ -306,6 +331,7 @@ PLUS : [+];
 MINUS : [-];
 ASTERISK : [*];
 DASH : [/];
+COMMA : [,];
 
 DOUBLE_EQUAL : [=][=];
 LESS : [<];
