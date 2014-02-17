@@ -65,8 +65,17 @@ public abstract class TSValue
 
   public final TSNumber unaryMinus() 
   {
-    TSNumber leftValue = this.toNumber(); 
-    return TSNumber.create(leftValue.getInternal() * -1.0);
+    TSPrimitive leftValue = this.toPrimitive();
+    Double lv = leftValue.toNumber().getInternal();
+
+    if (Double.isNaN(lv))
+      return TSNumber.create(Double.NaN);
+    if (lv == -0.0)
+      return TSNumber.create(+0.0);
+    if (lv == +0.0)
+      return TSNumber.create(-0.0);
+
+    return TSNumber.create(lv * -1.0);
   }
 
   //
@@ -199,7 +208,7 @@ public abstract class TSValue
     TSPrimitive leftValue = this.toPrimitive();
     TSPrimitive rightValue = right.toPrimitive();
     double ln = leftValue.toNumber().getInternal();
-    double rn = -leftValue.toNumber().getInternal();
+    double rn = -rightValue.toNumber().getInternal();
 
     if (Double.isNaN(ln) || Double.isNaN(rn))
       return TSNumber.create(Double.NaN);

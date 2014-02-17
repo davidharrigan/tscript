@@ -744,7 +744,7 @@ public class TscriptParser extends Parser {
 		public Expression lval;
 		public MultiplicativeExpressionContext l;
 		public UnaryExpressionContext p;
-		public PrimaryExpressionContext r;
+		public UnaryExpressionContext r;
 		public TerminalNode ASTERISK() { return getToken(TscriptParser.ASTERISK, 0); }
 		public UnaryExpressionContext unaryExpression() {
 			return getRuleContext(UnaryExpressionContext.class,0);
@@ -752,9 +752,6 @@ public class TscriptParser extends Parser {
 		public TerminalNode DASH() { return getToken(TscriptParser.DASH, 0); }
 		public MultiplicativeExpressionContext multiplicativeExpression() {
 			return getRuleContext(MultiplicativeExpressionContext.class,0);
-		}
-		public PrimaryExpressionContext primaryExpression() {
-			return getRuleContext(PrimaryExpressionContext.class,0);
 		}
 		public MultiplicativeExpressionContext(ParserRuleContext parent, int invokingState) { super(parent, invokingState); }
 		public MultiplicativeExpressionContext(ParserRuleContext parent, int invokingState, int _p) {
@@ -798,7 +795,7 @@ public class TscriptParser extends Parser {
 						setState(142);
 						if (!(2 >= _localctx._p)) throw new FailedPredicateException(this, "2 >= $_p");
 						setState(143); match(ASTERISK);
-						setState(144); ((MultiplicativeExpressionContext)_localctx).r = primaryExpression();
+						setState(144); ((MultiplicativeExpressionContext)_localctx).r = unaryExpression();
 						 ((MultiplicativeExpressionContext)_localctx).lval =  buildBinaryOperator(loc(_localctx.start), Binop.MULTIPLY,
 						                ((MultiplicativeExpressionContext)_localctx).l.lval, ((MultiplicativeExpressionContext)_localctx).r.lval); 
 						}
@@ -812,7 +809,7 @@ public class TscriptParser extends Parser {
 						setState(147);
 						if (!(1 >= _localctx._p)) throw new FailedPredicateException(this, "1 >= $_p");
 						setState(148); match(DASH);
-						setState(149); ((MultiplicativeExpressionContext)_localctx).r = primaryExpression();
+						setState(149); ((MultiplicativeExpressionContext)_localctx).r = unaryExpression();
 						 ((MultiplicativeExpressionContext)_localctx).lval =  buildBinaryOperator(loc(_localctx.start), Binop.DIVIDE, 
 						                ((MultiplicativeExpressionContext)_localctx).l.lval, ((MultiplicativeExpressionContext)_localctx).r.lval); 
 						}
@@ -1260,13 +1257,13 @@ public class TscriptParser extends Parser {
 		"}\3\2\2\2\u0087\u0082\3\2\2\2\u0088\u008b\3\2\2\2\u0089\u0087\3\2\2\2"+
 		"\u0089\u008a\3\2\2\2\u008a\33\3\2\2\2\u008b\u0089\3\2\2\2\u008c\u008d"+
 		"\b\17\1\2\u008d\u008e\5$\23\2\u008e\u008f\b\17\1\2\u008f\u009c\3\2\2\2"+
-		"\u0090\u0091\6\17\6\3\u0091\u0092\7\r\2\2\u0092\u0093\5\36\20\2\u0093"+
-		"\u0094\b\17\1\2\u0094\u009b\3\2\2\2\u0095\u0096\6\17\7\3\u0096\u0097\7"+
-		"\16\2\2\u0097\u0098\5\36\20\2\u0098\u0099\b\17\1\2\u0099\u009b\3\2\2\2"+
-		"\u009a\u0090\3\2\2\2\u009a\u0095\3\2\2\2\u009b\u009e\3\2\2\2\u009c\u009a"+
-		"\3\2\2\2\u009c\u009d\3\2\2\2\u009d\35\3\2\2\2\u009e\u009c\3\2\2\2\u009f"+
-		"\u00a0\7\27\2\2\u00a0\u00af\b\20\1\2\u00a1\u00a2\7\3\2\2\u00a2\u00af\b"+
-		"\20\1\2\u00a3\u00a4\7\5\2\2\u00a4\u00af\b\20\1\2\u00a5\u00a6\7\4\2\2\u00a6"+
+		"\u0090\u0091\6\17\6\3\u0091\u0092\7\r\2\2\u0092\u0093\5$\23\2\u0093\u0094"+
+		"\b\17\1\2\u0094\u009b\3\2\2\2\u0095\u0096\6\17\7\3\u0096\u0097\7\16\2"+
+		"\2\u0097\u0098\5$\23\2\u0098\u0099\b\17\1\2\u0099\u009b\3\2\2\2\u009a"+
+		"\u0090\3\2\2\2\u009a\u0095\3\2\2\2\u009b\u009e\3\2\2\2\u009c\u009a\3\2"+
+		"\2\2\u009c\u009d\3\2\2\2\u009d\35\3\2\2\2\u009e\u009c\3\2\2\2\u009f\u00a0"+
+		"\7\27\2\2\u00a0\u00af\b\20\1\2\u00a1\u00a2\7\3\2\2\u00a2\u00af\b\20\1"+
+		"\2\u00a3\u00a4\7\5\2\2\u00a4\u00af\b\20\1\2\u00a5\u00a6\7\4\2\2\u00a6"+
 		"\u00af\b\20\1\2\u00a7\u00a8\7\6\2\2\u00a8\u00af\b\20\1\2\u00a9\u00aa\7"+
 		"\7\2\2\u00aa\u00ab\5\24\13\2\u00ab\u00ac\7\b\2\2\u00ac\u00ad\b\20\1\2"+
 		"\u00ad\u00af\3\2\2\2\u00ae\u009f\3\2\2\2\u00ae\u00a1\3\2\2\2\u00ae\u00a3"+

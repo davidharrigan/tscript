@@ -140,10 +140,10 @@ multiplicativeExpression
   returns [ Expression lval ]
   : p=unaryExpression
     { $lval = $p.lval; }
-  | l=multiplicativeExpression ASTERISK r=primaryExpression
+  | l=multiplicativeExpression ASTERISK r=unaryExpression
     { $lval = buildBinaryOperator(loc($start), Binop.MULTIPLY,
       $l.lval, $r.lval); }
-  | l=multiplicativeExpression DASH r=primaryExpression
+  | l=multiplicativeExpression DASH r=unaryExpression
     { $lval = buildBinaryOperator(loc($start), Binop.DIVIDE, 
       $l.lval, $r.lval); }
   ;
