@@ -112,5 +112,18 @@ public final class TreeDump extends TreeVisitorBase<Object>
     return null;
   }
 
+  public Object visit(final BlockStatement blockStatement) 
+  {
+    indent();
+    writer.println("BlockStatement");
+    return null;
+  }
+
+  public Object visit(final EmptyStatement emptyStatement)
+  {
+    indent();
+    writer.println("EmptyStatement");
+    return null;
+  }
 }
 

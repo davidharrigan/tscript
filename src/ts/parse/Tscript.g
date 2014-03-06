@@ -44,50 +44,89 @@ statementList
   : // empty rule
     { $lval = new ArrayList<Statement>(); }
   | sl=statementList s=statement
-    { $sl.lval.add($s.lval);
-      $lval = $sl.lval; }
+    { for (int i=0; i < $s.lval.size(); i++) 
+        $sl.lval.add($s.lval.get(i));
+      $lval = $sl.lval;
+    }
   ;
 
 statement
-  returns [ Statement lval ]
-  : v=varStatement
+  returns [ List<Statement> lval ]
+  : b=blockStatement
+    { $lval = $b.lval; }
+  | v=varStatement
     { $lval = $v.lval; }
+  | empty=emptyStatement
+    { $lval = new ArrayList<Statement>();
+      $lval.add($empty.lval); }
   | e=expressionStatement
-    { $lval = $e.lval; }
+    { $lval = new ArrayList<Statement>();
+      $lval.add($e.lval); }
   | p=printStatement
-    { $lval = $p.lval; }
+    { $lval = new ArrayList<Statement>();
+      $lval.add($p.lval); }
+  ;
+
+blockStatement
+  returns [ List<Statement> lval ]
+  : '{' '}'
+    { $lval = new ArrayList<Statement>();
+      $lval.add(buildBlockStatement(loc($start))); }
+  | '{' s=statementList '}'
+    { $lval = $s.lval; 
+      $lval.add(buildBlockStatement(loc($start))); }
+  ;
+
+emptyStatement
+  returns [ Statement lval ]
+  : SEMICOLON
+    { $lval = buildEmptyStatement(loc($start)); }
   ;
 
 // Variable Statement ---------------------------------------------------------
 //
 varStatement
-  returns [ Statement lval ]
+  returns [ List<Statement> lval ]
   : VAR v=variableDeclarationList SEMICOLON
-  { $lval = $v.lval; }
+    { $lval = $v.lval; }
   //: VAR IDENTIFIER SEMICOLON
   //  { $lval = buildVarStatement(loc($start), $IDENTIFIER.text); }
   ;
 
 variableDeclarationList
-  returns [ Statement lval ]
-  : v=variableDeclaration
-    { $lval = $v.lval; }
-  | variableDeclarationList COMMA v=variableDeclaration
-    { $lval = $v.lval; }
+  returns [ List<Statement> lval ]
+  : //empty rule
+    { $lval = new ArrayList<Statement>(); }
+  | vl=variableDeclarationList v=variableDeclaration
+    { for (int i=0; i<$v.lval.size(); i++)
+        $vl.lval.add($v.lval.get(i)); 
+      $lval = $vl.lval; }
+  | vl=variableDeclarationList COMMA v=variableDeclaration
+    { for (int i=0; i<$v.lval.size(); i++)
+        $vl.lval.add($v.lval.get(i)); 
+      $lval = $vl.lval; }
   ;
 
 variableDeclaration
-  returns [ Statement lval ]
+  returns [ List<Statement> lval ]
   : IDENTIFIER
-    { $lval = buildVarStatement(loc($start), $IDENTIFIER.text); }
+    { $lval = new ArrayList<Statement>();
+      $lval.add(buildVarStatement(loc($start), $IDENTIFIER.text)); }
   | IDENTIFIER i=initialiser
-    { $lval = buildVarStatement(loc($start), $IDENTIFIER.text); }
+    { $lval = new ArrayList<Statement>(); 
+      $lval.add(buildVarStatement(loc($start), $IDENTIFIER.text));
+
+      Expression left = buildIdentifier(loc($start), $IDENTIFIER.text); 
+      checkAssignmentDestination(loc($start), left);
+      Expression assgn = buildBinaryOperator(loc($start), Binop.ASSIGN, left, $i.lval);
+      $lval.add(buildExpressionStatement(loc($start), assgn)); 
+    }
   ;
 
 initialiser
-  returns [ Statement lval ]
+  returns [ Expression lval ]
   : EQUAL a=assignmentExpression 
-    { $lval = buildExpressionStatement(loc($start), $a.lval); } 
+    {$lval = $a.lval;}
   ;
 
 expressionStatement

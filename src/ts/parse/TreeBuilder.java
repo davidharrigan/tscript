@@ -126,8 +126,10 @@ public class TreeBuilder
     return new NumericLiteral(loc, d);
   }
 
-  /**
-   *
+  /** Build a string literal
+   *  
+   * @param loc    location in source code (file, line, column)
+   * @param value  value in string
    */
   public static Expression buildStringLiteral(final Location loc, 
     final String value) 
@@ -138,8 +140,10 @@ public class TreeBuilder
     return new StringLiteral(loc, s);
   }
 
-  /** 
-   *
+  /** Build a boolean literal
+   *  
+   * @param loc    location in source code (file, line, column)
+   * @param value  value in string
    */
   public static Expression buildBooleanLiteral(final Location loc, 
     final String value)
@@ -163,6 +167,22 @@ public class TreeBuilder
     return new PrintStatement(loc, exp);
   }
 
+
+  /** Build a block statement.
+   *
+   *
+   */
+  public static Statement buildBlockStatement(final Location loc)
+  {
+    Message.log("TreeBuilder: BlockStatment");
+    return new BlockStatement(loc);
+  }
+
+  public static Statement buildEmptyStatement(final Location loc) 
+  {
+    Message.log("TreeBuilder: EmptyStatement");
+    return new EmptyStatement(loc);
+  }
 
   //
   // methods to detect "early" (i.e. semantic) errors

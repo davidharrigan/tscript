@@ -171,5 +171,15 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
   {
     return TSCompletion.createNormal(TSNull.create(nullLiteral.getValue()));
   }
+
+  public TSCompletion visit(final BlockStatement blockStatement)
+  {
+      return TSCompletion.create(TSCompletionType.Normal, null, null);
+  }
+
+  public TSCompletion visit(final EmptyStatement emptyStatement) 
+  {
+      return TSCompletion.createNormalNull();
+  }
 }
 

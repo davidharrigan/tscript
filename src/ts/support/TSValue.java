@@ -291,6 +291,9 @@ public abstract class TSValue
     return false;
   }
 
+  /** Perform an abstract relational comparison algorithm.
+   *
+   */
   private boolean abstractRelationalComparison(TSPrimitive left, 
     TSPrimitive right, boolean leftFirst)
   {

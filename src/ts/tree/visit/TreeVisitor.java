@@ -29,5 +29,9 @@ public interface TreeVisitor<T>
   T visit(StringLiteral stringLiteral);
 
   T visit(NullLiteral nullLiteral);
+
+  T visit(BlockStatement blockStatement);
+
+  T visit(EmptyStatement emptyStatement);
 }
 
