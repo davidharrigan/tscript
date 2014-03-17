@@ -192,31 +192,27 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
         return TSCompletion.createNormal(v);
       }
       
-      List<Statement> stmts = whileStatement.getStatements();
-      TSCompletion stmt = visitNode(stmts.get(stmts.size()-1));
+      TSCompletion stmt = visitNode(whileStatement.getStatement());
       
       if (stmt.getValue() != null) 
       {
         v = stmt.getValue();
       }
 
-      
+      //fix null pointer here
       if (!stmt.getType().equals(TSCompletionType.Continue) ||
           !stmt.getTarget().toStr().getInternal().equals(labelStack.peek().getName()))
       {
-        if (labelStack.size() > 0) {
-          System.out.println("cur label : " + labelStack.peek().getName());
-        }
-                  System.out.println("cur type  : " + stmt.getType().toString());
-
         if (stmt.getType() == TSCompletionType.Break &&
             stmt.getTarget().toStr().getInternal().equals(labelStack.peek().getName())) {//&& something about label)
           System.out.println("Label is : " + labelStack.peek().getName());
           return TSCompletion.createNormal(v);
         }
         
-        if (stmt.getType() != TSCompletionType.Normal)        
+        if (stmt.getType() != TSCompletionType.Normal) {
+          System.out.println("abrupt completion in while");
           return stmt;
+        }
       }
       
     }
@@ -226,7 +222,9 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
   {
     if (breakStatement.getName() == null)
     {
-      return TSCompletion.createNormalNull();
+      return TSCompletion.create(TSCompletionType.Break, 
+        null, 
+        null);
     }
     return TSCompletion.create(TSCompletionType.Break, 
       null, 
@@ -237,7 +235,9 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
   {
     if (continueStatement.getName() == null)
     {
-      return TSCompletion.createNormalNull();
+      return TSCompletion.create(TSCompletionType.Continue, 
+        null, 
+        null);
     }
     return TSCompletion.create(TSCompletionType.Continue, 
       null, 
@@ -246,17 +246,15 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
 
   public TSCompletion visit(final LabelledStatement labelledStatement)
   {
-    System.out.println(labelStack.peek().getName());
     TSCompletion stmt = visitNode(labelledStatement.getStatement());
+    this.labelStack.pop();     
 
     if (stmt.getType() == TSCompletionType.Break && 
         stmt.getTarget().toStr().getInternal().equals(labelledStatement.getName())) 
     {
-      System.out.println("breakin");
-      this.labelStack.pop();
+
       return TSCompletion.createNormal(stmt.getValue());
     }
-    this.labelStack.pop();
     return TSCompletion.createNormalNull();
   }
 

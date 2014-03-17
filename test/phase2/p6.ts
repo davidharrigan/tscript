@@ -20,6 +20,7 @@ while (n > 0)
           j = 0;
           break x;
         }
+        print("nigger");
         j = j - 1;
       }
       print(1066);

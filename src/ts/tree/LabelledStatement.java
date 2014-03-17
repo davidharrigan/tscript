@@ -34,7 +34,6 @@ public final class LabelledStatement extends Statement
 
 	public <T> T apply(TreeVisitor<T> visitor)
 	{
-		System.out.println("Pushing label " + this.name);
 		visitor.labelStack.push(this);
 		return visitor.visit(this);
 	}

@@ -21,13 +21,13 @@ import ts.tree.visit.TreeVisitor;
  */
 public final class WhileStatement extends Statement 
 {
-	private List<Statement> statements;
+	private Statement statement;
 	private Expression expression;
 
 	public WhileStatement(final Location loc, Expression expression, List<Statement> statements)
 	{
 		super(loc);
-		this.statements = statements;
+		this.statement = statements.get(0);
 		this.expression = expression;
 	}
 
@@ -36,9 +36,9 @@ public final class WhileStatement extends Statement
 		return visitor.visit(this);
 	}
 
-	public List<Statement> getStatements() 
+	public Statement getStatements() 
 	{
-		return this.statements;
+		return this.statement;
 	}
 
 	public Expression getExpression() 
