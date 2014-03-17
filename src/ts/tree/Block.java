@@ -1,4 +1,3 @@
-
 package ts.tree;
 
 import ts.Location;

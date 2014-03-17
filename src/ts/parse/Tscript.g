@@ -53,7 +53,8 @@ statementList
 statement
   returns [ List<Statement> lval ]
   : b=blockStatement
-    { $lval = $b.lval; }
+    { $lval = new ArrayList<Statement>();
+      $lval.add($b.lval); }
   | v=varStatement
     { $lval = $v.lval; }
   | empty=emptyStatement
@@ -62,25 +63,84 @@ statement
   | e=expressionStatement
     { $lval = new ArrayList<Statement>();
       $lval.add($e.lval); }
+  | iter=iterationStatement
+    { $lval = new ArrayList<Statement>(); 
+      $lval.add($iter.lval); }
+  | bStatement=breakStatement
+    { $lval = new ArrayList<Statement>();
+      $lval.add($bStatement.lval); }
+  | cStatement=continueStatement
+    { $lval = new ArrayList<Statement>(); 
+      $lval.add($cStatement.lval); }
+  | lStatement=labelledStatement
+    { $lval = new ArrayList<Statement>();
+      $lval.add($lStatement.lval); }
+  | i=ifStatement
+    { $lval = new ArrayList<Statement>();
+      $lval.add($i.lval); }
   | p=printStatement
     { $lval = new ArrayList<Statement>();
       $lval.add($p.lval); }
   ;
 
+// Block Statement ------------------------------------------------------------
+//
 blockStatement
-  returns [ List<Statement> lval ]
+  returns [ Statement lval ]
   : '{' '}'
-    { $lval = new ArrayList<Statement>();
-      $lval.add(buildBlockStatement(loc($start))); }
+    { $lval = buildBlockStatement(loc($start), null); }
   | '{' s=statementList '}'
-    { $lval = $s.lval; 
-      $lval.add(buildBlockStatement(loc($start))); }
+    { $lval = buildBlockStatement(loc($start), $s.lval); }
   ;
 
+// Empty Statement -----------------------------------------------------------
+//
 emptyStatement
   returns [ Statement lval ]
   : SEMICOLON
     { $lval = buildEmptyStatement(loc($start)); }
+  ;
+
+// Iteration Statement --------------------------------------------------------
+//
+iterationStatement
+  returns [ Statement lval ]
+  :// 'do' s=statement 'while' RPAREN e=expression LPAREN SEMICOLON
+   // { }
+   'while' LPAREN e=expression RPAREN s=statement 
+    { $lval = buildWhileStatement(loc($start), $e.lval, $s.lval); }
+  ;
+
+breakStatement
+  returns [ Statement lval ]
+  : 'break' SEMICOLON
+    { $lval = buildBreakStatement(loc($start), null); }
+  | 'break' IDENTIFIER SEMICOLON
+    { $lval = buildBreakStatement(loc($start), $IDENTIFIER.text);}
+  ;
+
+continueStatement
+  returns [ Statement lval ]
+  : 'continue' SEMICOLON
+    { $lval = buildContinueStatement(loc($start), null); }
+  | 'continue' IDENTIFIER SEMICOLON
+    { $lval = buildContinueStatement(loc($start), $IDENTIFIER.text);}
+  ;
+
+labelledStatement
+  returns [ Statement lval ]
+  : IDENTIFIER COLON s=statement
+    { $lval = buildLabelledStatement(loc($start), $IDENTIFIER.text, $s.lval); }
+  ;
+
+// If Statement ---------------------------------------------------------------
+//
+ifStatement
+  returns [ Statement lval ]
+  : 'if' LPAREN e=expression RPAREN s1=statement 'else' s2=statement
+    { $lval = buildIfStatement(loc($start), $e.lval, $s1.lval, $s2.lval); }
+  | 'if' LPAREN e=expression RPAREN s=statement
+    { $lval = buildIfStatement(loc($start), $e.lval, $s.lval, null); }
   ;
 
 // Variable Statement ---------------------------------------------------------
@@ -365,6 +425,7 @@ NULL_LITERAL
 LPAREN : [(];
 RPAREN : [)];
 SEMICOLON : [;];
+COLON : [:];
 EQUAL : [=];
 PLUS : [+];
 MINUS : [-];

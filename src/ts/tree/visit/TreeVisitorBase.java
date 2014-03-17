@@ -90,6 +90,7 @@ public class TreeVisitorBase<T> implements TreeVisitor<T>
 
   public T visit(final BlockStatement blockStatement) 
   {
+    visitEach(blockStatement.getStatements());
     return null;
   }
 
@@ -98,5 +99,30 @@ public class TreeVisitorBase<T> implements TreeVisitor<T>
     return null;
   }
 
+  public T visit(final WhileStatement whileStatement) 
+  {
+    System.out.println("lol");
+    return null;
+  }
+
+  public T visit(final IfStatement ifStatement)
+  {
+    return null;
+  }
+
+  public T visit(final BreakStatement breakStatement)
+  {
+    return null;
+  }
+
+  public T visit(final ContinueStatement continueStatement)
+  {
+    return null;
+  }
+
+  public T visit(final LabelledStatement labelledStatement)
+  {
+    return null;
+  }
 } 
 

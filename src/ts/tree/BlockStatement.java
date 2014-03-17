@@ -1,5 +1,7 @@
 package ts.tree;
 
+import java.util.List;
+
 import ts.Location;
 import ts.tree.visit.TreeVisitor;
 
@@ -9,9 +11,11 @@ import ts.tree.visit.TreeVisitor;
  */
 public final class BlockStatement extends Statement
 {
-	public BlockStatement(final Location loc)
+	private List<Statement> statements;
+	public BlockStatement(final Location loc, final List<Statement> statements)
 	{
 		super(loc);
+		this.statements = statements;
 	}
 
 	public <T> T apply(TreeVisitor<T> visitor)
@@ -19,4 +23,8 @@ public final class BlockStatement extends Statement
 		return visitor.visit(this);
 	}
 
+	public List<Statement> getStatements() 
+	{
+		return this.statements;
+	}
 }

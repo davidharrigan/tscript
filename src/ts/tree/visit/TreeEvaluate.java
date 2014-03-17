@@ -174,7 +174,120 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
 
   public TSCompletion visit(final BlockStatement blockStatement)
   {
+    List<TSCompletion> ret; 
+    if (blockStatement.getStatements() == null)
       return TSCompletion.create(TSCompletionType.Normal, null, null);
+    else 
+        ret = visitEach(blockStatement.getStatements());
+      return ret.get(ret.size() - 1);
+  }
+
+  public TSCompletion visit(final WhileStatement whileStatement) 
+  {
+    TSValue v = null;
+    while (true) {
+      TSCompletion exprRef = visitNode(whileStatement.getExpression());
+      if (exprRef.getValue().toBoolean().getInternal() == false) 
+      {
+        return TSCompletion.createNormal(v);
+      }
+      
+      List<Statement> stmts = whileStatement.getStatements();
+      TSCompletion stmt = visitNode(stmts.get(stmts.size()-1));
+      
+      if (stmt.getValue() != null) 
+      {
+        v = stmt.getValue();
+      }
+
+      
+      if (!stmt.getType().equals(TSCompletionType.Continue) ||
+          !stmt.getTarget().toStr().getInternal().equals(labelStack.peek().getName()))
+      {
+        if (labelStack.size() > 0) {
+          System.out.println("cur label : " + labelStack.peek().getName());
+        }
+                  System.out.println("cur type  : " + stmt.getType().toString());
+
+        if (stmt.getType() == TSCompletionType.Break &&
+            stmt.getTarget().toStr().getInternal().equals(labelStack.peek().getName())) {//&& something about label)
+          System.out.println("Label is : " + labelStack.peek().getName());
+          return TSCompletion.createNormal(v);
+        }
+        
+        if (stmt.getType() != TSCompletionType.Normal)        
+          return stmt;
+      }
+      
+    }
+  }
+
+  public TSCompletion visit(final BreakStatement breakStatement)
+  {
+    if (breakStatement.getName() == null)
+    {
+      return TSCompletion.createNormalNull();
+    }
+    return TSCompletion.create(TSCompletionType.Break, 
+      null, 
+      TSString.create(breakStatement.getName()));
+  }
+
+  public TSCompletion visit(final ContinueStatement continueStatement)
+  {
+    if (continueStatement.getName() == null)
+    {
+      return TSCompletion.createNormalNull();
+    }
+    return TSCompletion.create(TSCompletionType.Continue, 
+      null, 
+      TSString.create(continueStatement.getName()));
+  }
+
+  public TSCompletion visit(final LabelledStatement labelledStatement)
+  {
+    System.out.println(labelStack.peek().getName());
+    TSCompletion stmt = visitNode(labelledStatement.getStatement());
+
+    if (stmt.getType() == TSCompletionType.Break && 
+        stmt.getTarget().toStr().getInternal().equals(labelledStatement.getName())) 
+    {
+      System.out.println("breakin");
+      this.labelStack.pop();
+      return TSCompletion.createNormal(stmt.getValue());
+    }
+    this.labelStack.pop();
+    return TSCompletion.createNormalNull();
+  }
+
+  public TSCompletion visit(final IfStatement ifStatement)
+  {
+    Expression expr = ifStatement.getExpression();
+    Statement s1    = ifStatement.getStatement1();
+    Statement s2    = ifStatement.getStatement2();
+
+    TSCompletion exprRef = visitNode(expr);
+
+    if (s2 != null) 
+    {
+      if (exprRef.getValue().toBoolean().getInternal() == true)
+      {
+        return visitNode(s1);
+      }
+      else 
+      {
+        return visitNode(s2);
+      }
+    }
+
+    else 
+    {
+      if (exprRef.getValue().toBoolean().getInternal() == false)
+      {
+        return TSCompletion.createNormalNull();
+      }
+      return visitNode(s1);
+    }
   }
 
   public TSCompletion visit(final EmptyStatement emptyStatement) 

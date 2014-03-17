@@ -55,6 +55,7 @@ public final class TreeDump extends TreeVisitorBase<Object>
   {
     for (final Object node : nodes)
     {
+      indent();
       visitNode((Tree) node);
     }
     return null;
@@ -116,6 +117,7 @@ public final class TreeDump extends TreeVisitorBase<Object>
   {
     indent();
     writer.println("BlockStatement");
+    visitEach(blockStatement.getStatements());
     return null;
   }
 

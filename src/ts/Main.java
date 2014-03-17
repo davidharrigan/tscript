@@ -152,6 +152,8 @@ public class Main
       Message.syntaxError(loc);   // exits the program
     }
 
+    // INVOKE OTHER TREE HERE
+
     // a program is a List<Statement>
     // (use unbounded wildcard to avoid unchecked cast)
     List<?> root = (List<?>) parser.getSemanticValue();

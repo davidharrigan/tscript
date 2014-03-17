@@ -1,5 +1,7 @@
 package ts.parse;
 
+import java.util.List;
+
 import ts.Location;
 import ts.Message;
 import ts.tree.*;
@@ -172,16 +174,81 @@ public class TreeBuilder
    *
    *
    */
-  public static Statement buildBlockStatement(final Location loc)
+  public static Statement buildBlockStatement(final Location loc, 
+    final List<Statement> statements)
   {
     Message.log("TreeBuilder: BlockStatment");
-    return new BlockStatement(loc);
+    return new BlockStatement(loc, statements);
   }
 
+  /** Build an empty statement
+   *
+   *
+   */
   public static Statement buildEmptyStatement(final Location loc) 
   {
     Message.log("TreeBuilder: EmptyStatement");
     return new EmptyStatement(loc);
+  }
+
+  /** Build a while statement
+   *
+   *
+   */
+  public static Statement buildWhileStatement(final Location loc, 
+    final Expression expression,
+    final List<Statement> statements 
+    )
+  {
+    Message.log("TreeBuilder: WhileStatement");
+    return new WhileStatement(loc, expression, statements);
+  }
+
+  /** Build a if statement
+   *
+   *
+   */
+  public static Statement buildIfStatement(final Location loc, 
+      final Expression expression,
+      final List<Statement> statement1,
+      final List<Statement> statement2)
+  {
+    Message.log("TreeBuilder: IfStatement");
+    return new IfStatement(loc, expression, statement1, statement2);
+  }
+
+  /** Build a break statement
+   *
+   *
+   */
+  public static Statement buildBreakStatement(final Location loc,
+      final String name)
+  {
+    Message.log("TreeBuilder: BreakStatement");
+    return new BreakStatement(loc, name);
+  }
+
+  /** Build a continue statement
+   *
+   *
+   */
+  public static Statement buildContinueStatement(final Location loc,
+      final String name)
+  {
+    Message.log("TreeBuilder: ContinueStatement");
+    return new ContinueStatement(loc, name);
+  }
+
+  /** Build a labelled statement
+   *
+   *
+   */
+  public static Statement buildLabelledStatement(final Location loc,
+      final String name,
+      final List<Statement> statement) 
+  {
+    Message.log("TreeBuilder: buildLablledStatement");
+    return new LabelledStatement(loc, name, statement);
   }
 
   //

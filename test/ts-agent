@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# translate and execute a Tscript program
+#
+TS_ROOT="/home/david/Code/CS/cs712/tscript"
+java -agentpath:/home/david/Code/CS/cs712/tracer/agent/libjtracer-agent.so=::out-prefix=/home/david/Code/CS/cs712/output/::selector=+** -ea -cp "$TS_ROOT/build/packages:$TS_ROOT/build/lib/antlr.jar" ts.Main $@

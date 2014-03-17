@@ -1,6 +1,8 @@
 
 package ts.tree.visit;
 
+import java.util.Stack;
+
 import ts.tree.*;
 
 /**
@@ -10,6 +12,8 @@ import ts.tree.*;
  */
 public interface TreeVisitor<T>
 {
+  Stack<LabelledStatement> labelStack = new Stack<LabelledStatement>();
+
   T visit(BinaryOperator binaryOperator);
 
   T visit(UnaryOperator unaryOperator);
@@ -33,5 +37,15 @@ public interface TreeVisitor<T>
   T visit(BlockStatement blockStatement);
 
   T visit(EmptyStatement emptyStatement);
+
+  T visit(WhileStatement whileStatement);
+
+  T visit(IfStatement ifStatement);
+
+  T visit(BreakStatement breakStatement);
+
+  T visit(ContinueStatement continueStatement);
+
+  T visit(LabelledStatement labelledStatement);
 }
 
