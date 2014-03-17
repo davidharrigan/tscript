@@ -83,8 +83,8 @@ statement
       $lval.add($p.lval); }
   ;
 
-// Block Statement ------------------------------------------------------------
-//
+// Block Statement 
+// ------------------------------------------------------------------
 blockStatement
   returns [ Statement lval ]
   : '{' '}'
@@ -93,16 +93,16 @@ blockStatement
     { $lval = buildBlockStatement(loc($start), $s.lval); }
   ;
 
-// Empty Statement -----------------------------------------------------------
-//
+// Empty Statement
+// ------------------------------------------------------------------
 emptyStatement
   returns [ Statement lval ]
   : SEMICOLON
     { $lval = buildEmptyStatement(loc($start)); }
   ;
 
-// Iteration Statement --------------------------------------------------------
-//
+// Iteration Statement
+// ------------------------------------------------------------------
 iterationStatement
   returns [ Statement lval ]
   :// 'do' s=statement 'while' RPAREN e=expression LPAREN SEMICOLON
@@ -111,6 +111,8 @@ iterationStatement
     { $lval = buildWhileStatement(loc($start), $e.lval, $s.lval); }
   ;
 
+// Break Statement
+// ------------------------------------------------------------------
 breakStatement
   returns [ Statement lval ]
   : 'break' SEMICOLON
@@ -119,6 +121,8 @@ breakStatement
     { $lval = buildBreakStatement(loc($start), $IDENTIFIER.text);}
   ;
 
+// Continue Statement
+// ------------------------------------------------------------------
 continueStatement
   returns [ Statement lval ]
   : 'continue' SEMICOLON
@@ -127,14 +131,16 @@ continueStatement
     { $lval = buildContinueStatement(loc($start), $IDENTIFIER.text);}
   ;
 
+// Labelled Statement
+// ------------------------------------------------------------------
 labelledStatement
   returns [ Statement lval ]
   : IDENTIFIER COLON s=statement
     { $lval = buildLabelledStatement(loc($start), $IDENTIFIER.text, $s.lval); }
   ;
 
-// If Statement ---------------------------------------------------------------
-//
+// If Statement
+// ------------------------------------------------------------------
 ifStatement
   returns [ Statement lval ]
   : 'if' LPAREN e=expression RPAREN s1=statement 'else' s2=statement
@@ -143,8 +149,8 @@ ifStatement
     { $lval = buildIfStatement(loc($start), $e.lval, $s.lval, null); }
   ;
 
-// Variable Statement ---------------------------------------------------------
-//
+// Variable Statement
+// ------------------------------------------------------------------
 varStatement
   returns [ List<Statement> lval ]
   : VAR v=variableDeclarationList SEMICOLON
@@ -153,6 +159,8 @@ varStatement
   //  { $lval = buildVarStatement(loc($start), $IDENTIFIER.text); }
   ;
 
+// Variable Declaration List
+// ------------------------------------------------------------------
 variableDeclarationList
   returns [ List<Statement> lval ]
   : //empty rule
@@ -167,6 +175,8 @@ variableDeclarationList
       $lval = $vl.lval; }
   ;
 
+// Variable Declaration
+// ------------------------------------------------------------------
 variableDeclaration
   returns [ List<Statement> lval ]
   : IDENTIFIER
@@ -183,30 +193,40 @@ variableDeclaration
     }
   ;
 
+// Initialiser
+// ------------------------------------------------------------------
 initialiser
   returns [ Expression lval ]
   : EQUAL a=assignmentExpression 
     {$lval = $a.lval;}
   ;
 
+// Expression Statement
+// ------------------------------------------------------------------
 expressionStatement
   returns [ Statement lval ]
   : e=expression SEMICOLON
     { $lval = buildExpressionStatement(loc($start), $e.lval); }
   ;
 
+// Print Statement
+// ------------------------------------------------------------------
 printStatement
   returns [ Statement lval ]
   : PRINT e=expression SEMICOLON
     { $lval = buildPrintStatement(loc($start), $e.lval); }
   ;
 
+// Expression
+// ------------------------------------------------------------------
 expression
   returns [ Expression lval ]
   : a=assignmentExpression
     { $lval = $a.lval; }
   ;
 
+// Assignment Expression
+// ------------------------------------------------------------------
 assignmentExpression
   returns [ Expression lval ]
   : e=equalityExpression
@@ -217,12 +237,16 @@ assignmentExpression
         $l.lval, $r.lval); }
   ;
 
+// Left Hand Side Expression
+// ------------------------------------------------------------------
 leftHandSideExpression
   returns [ Expression lval ]
   : p=primaryExpression
     { $lval = $p.lval; }
   ;
 
+// Additive Expression
+// ------------------------------------------------------------------
 additiveExpression
   returns [ Expression lval ]
   : m=multiplicativeExpression
@@ -235,6 +259,8 @@ additiveExpression
         $l.lval, $r.lval); }
   ;
 
+// Multiplicative Expression
+// ------------------------------------------------------------------
 multiplicativeExpression
   returns [ Expression lval ]
   : p=unaryExpression
@@ -247,6 +273,8 @@ multiplicativeExpression
       $l.lval, $r.lval); }
   ;
 
+// Primary Expression
+// ------------------------------------------------------------------
 primaryExpression
   returns [ Expression lval ]
   : IDENTIFIER
@@ -263,6 +291,8 @@ primaryExpression
     { $lval = $e.lval; }
   ;
 
+// Relational Expression
+// ------------------------------------------------------------------
 relationalExpression
   returns [ Expression lval ]
   : a=additiveExpression
@@ -273,6 +303,8 @@ relationalExpression
     { $lval = buildBinaryOperator(loc($start), Binop.GREATER, $l.lval, $r.lval); }
   ;
 
+// Equality Expression
+// ------------------------------------------------------------------
 equalityExpression
   returns [ Expression lval ]
   : re=relationalExpression
@@ -281,6 +313,8 @@ equalityExpression
     { $lval = buildBinaryOperator(loc($start), Binop.EQUAL, $l.lval, $r.lval); }
   ;
 
+// Unary Expression
+// ------------------------------------------------------------------
 unaryExpression
   returns [ Expression lval ]
   : le=leftHandSideExpression

@@ -45,7 +45,9 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
     ret.add(TSCompletion.createNormalNull());
     return ret;
   }
-  
+
+  // Unary Operator
+  // ----------------------------------------------------------------
   public TSCompletion visit(final UnaryOperator unaryOperator)
   {
     TSCompletion left = visitNode(unaryOperator.getLeft());
@@ -69,6 +71,8 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
     return left;
   }
 
+  // Binary Operator 
+  // ----------------------------------------------------------------
   public TSCompletion visit(final BinaryOperator binaryOperator)
   {
     TSCompletion left = visitNode(binaryOperator.getLeft());
@@ -121,24 +125,32 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
     return left;
   }
 
+  // Expression Statement
+  // ----------------------------------------------------------------
   public TSCompletion visit(final ExpressionStatement expressionStatement)
   {
     TSCompletion completion = visitNode(expressionStatement.getExp());
     return completion;
   }
 
+  // Identifier
+  // ----------------------------------------------------------------
   public TSCompletion visit(final Identifier identifier)
   {
     return TSCompletion.createNormal(environment.getIdentifierReference(
       TSString.create(identifier.getName())));
   }
 
+  // Numeric Literal
+  // ----------------------------------------------------------------
   public TSCompletion visit(final NumericLiteral numericLiteral)
   {
     return TSCompletion.createNormal(TSNumber.create(
       numericLiteral.getValue()));
   }
 
+  // Print Statement
+  // ----------------------------------------------------------------
   public TSCompletion visit(final PrintStatement printStatement)
   {
     TSCompletion result = visitNode(printStatement.getExp());
@@ -150,6 +162,8 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
     return TSCompletion.createNormalNull();
   }
 
+  // Variable Statement
+  // ----------------------------------------------------------------
   public TSCompletion visit(final VarStatement varStatement)
   {
     // do not make it a configurable binding so it is not deletable
@@ -157,21 +171,29 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
     return TSCompletion.createNormalNull();
   }
 
+  // Boolean Literal
+  // ----------------------------------------------------------------
   public TSCompletion visit(final BooleanLiteral booleanLiteral) 
   {
     return TSCompletion.createNormal(TSBoolean.create(booleanLiteral.getValue()));
   }
 
+  // String Literal
+  // ----------------------------------------------------------------
   public TSCompletion visit(final StringLiteral stringLiteral) 
   {
     return TSCompletion.createNormal(TSString.create(stringLiteral.getValue()));
   }
 
+  // Null Literal 
+  // ----------------------------------------------------------------
   public TSCompletion visit(final NullLiteral nullLiteral)
   {
     return TSCompletion.createNormal(TSNull.create(nullLiteral.getValue()));
   }
 
+  // Block Statement
+  // ----------------------------------------------------------------
   public TSCompletion visit(final BlockStatement blockStatement)
   {
     List<TSCompletion> ret; 
@@ -182,6 +204,8 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
       return ret.get(ret.size() - 1);
   }
 
+  // While Statement
+  // ----------------------------------------------------------------
   public TSCompletion visit(final WhileStatement whileStatement) 
   {
     TSValue v = null;
@@ -218,6 +242,8 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
     }
   }
 
+  // Break Statement
+  // ----------------------------------------------------------------
   public TSCompletion visit(final BreakStatement breakStatement)
   {
     if (breakStatement.getName() == null)
@@ -231,6 +257,8 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
       TSString.create(breakStatement.getName()));
   }
 
+  // Continue Statement
+  // ----------------------------------------------------------------
   public TSCompletion visit(final ContinueStatement continueStatement)
   {
     if (continueStatement.getName() == null)
@@ -244,6 +272,8 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
       TSString.create(continueStatement.getName()));
   }
 
+  // Labelled Statement
+  // ----------------------------------------------------------------
   public TSCompletion visit(final LabelledStatement labelledStatement)
   {
     TSCompletion stmt = visitNode(labelledStatement.getStatement());
@@ -258,6 +288,8 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
     return TSCompletion.createNormalNull();
   }
 
+  // If Statement
+  // ----------------------------------------------------------------
   public TSCompletion visit(final IfStatement ifStatement)
   {
     Expression expr = ifStatement.getExpression();
@@ -288,6 +320,8 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
     }
   }
 
+  // Empty Statement
+  // ----------------------------------------------------------------
   public TSCompletion visit(final EmptyStatement emptyStatement) 
   {
       return TSCompletion.createNormalNull();
