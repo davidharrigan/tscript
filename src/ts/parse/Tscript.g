@@ -81,6 +81,12 @@ statement
   | p=printStatement
     { $lval = new ArrayList<Statement>();
       $lval.add($p.lval); }
+  | th=throwStatement
+    { $lval = new ArrayList<Statement>();
+      $lval.add($th.lval); }
+  | tr=tryStatement
+    { $lval = new ArrayList<Statement>();
+      $lval.add($tr.lval); }
   ;
 
 // Block Statement 
@@ -241,10 +247,118 @@ assignmentExpression
 // ------------------------------------------------------------------
 leftHandSideExpression
   returns [ Expression lval ]
-  : p=primaryExpression
-    { $lval = $p.lval; }
+  : c=callExpression
+    { $lval = $c.lval; }
+  | n=newExpression
+    { $lval = $n.lval; }
   ;
 
+// Throw Statement
+// ------------------------------------------------------------------
+throwStatement
+  returns [ Statement lval ]
+  : 'throw' e=expression
+     { $lval = buildThrowStatement(loc($start), $e.lval); }
+  ;
+
+// Try Statement
+// ------------------------------------------------------------------
+tryStatement
+  returns [ Statement lval ]
+  : 'try' b=blockStatement c=catchClause
+    { $lval = buildTryStatement(loc($start), $b.lval, $c.lval, null); }
+  | 'try' b=blockStatement f=finallyClause
+    { $lval = buildTryStatement(loc($start), $b.lval, null, $f.lval); }
+  | 'try' b=blockStatement c=catchClause f=finallyClause
+    { $lval = buildTryStatement(loc($start), $b.lval, $c.lval, $f.lval); }
+  ;
+
+catchClause
+  returns [ Expression lval ]
+  : 'catch' LPAREN IDENTIFIER RPAREN b=blockStatement
+    { $lval = buildCatchClause(loc($start), $IDENTIFIER.text, $b.lval); }
+  ;
+
+finallyClause
+  returns [ Expression lval ]
+  : 'finally' b=blockStatement
+    { $lval = buildFinallyClause(loc($start), $b.lval); }
+  ;
+
+newExpression
+  returns [ Expression lval ]
+  : m=memberExpression
+    { $lval = $m.lval; }
+  ;
+
+callExpression
+  returns [ Expression lval ]
+  : m=memberExpression arguments
+    { $lval = buildFunctionCall(loc($start), $m.lval); }
+  ;
+
+memberExpression
+  returns [ Expression lval ]
+  : p=primaryExpression
+    { $lval = $p.lval; }
+  | f=functionExpression
+    { $lval = $f.lval; }
+  ;
+
+functionExpression
+  returns [ Expression lval ]
+  : 'function' LPAREN RPAREN '{' f=functionBody '}'
+    { $lval = buildFunctionExpression(loc($start), "", $f.lval); }
+  | 'function' IDENTIFIER LPAREN RPAREN '{' f=functionBody '}'
+    { $lval = buildFunctionExpression(loc($start), $IDENTIFIER.text, $f.lval); }
+
+  //| 'function' LPAREN formalParameterList RPAREN '{' functionBody '}'
+  //| 'function' IDENTIFIER LPAREN formalParameterList RPAREN '{' functionBody '}'
+  ;
+
+
+arguments
+  : LPAREN RPAREN
+  //| LPAREN argumentList RPAREN
+  ;
+
+functionBody
+  returns [ List<Statement> lval ]
+  : // empty rule
+    { $lval = new ArrayList<Statement>(); }
+  | sl=statementList s=statement
+    { for (int i=0; i < $s.lval.size(); i++) 
+        $sl.lval.add($s.lval.get(i));
+      $lval = $sl.lval;
+    }
+  ;
+/*
+functionDeclaration
+  : 'function' IDENTIFIER LPAREN RPAREN '{' functionBody '}'
+  | 'function' IDENTIFIER LPAREN formalParameterList RPAREN '{' functionBody '}'
+  ;
+
+
+formalParameterList
+  : IDENTIFIER
+  | formalParameterList COMMA IDENTIFIER
+  ;
+
+argumentList
+  : assignmentExpression
+  | argumentList COMMA assignmentExpression
+  ;
+
+sourceElements
+  : sourceElement
+  | sourceElements sourceElement
+  ;
+
+sourceElement
+  : statement
+  //| functionDeclaration
+  ;
+*/
 // Additive Expression
 // ------------------------------------------------------------------
 additiveExpression

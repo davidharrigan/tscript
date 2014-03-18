@@ -1,4 +1,5 @@
 
+
 package ts.support;
 
 import ts.Message;
@@ -437,6 +438,16 @@ public abstract class TSValue
     //           left.getClass() == TSObject.class)
     // return abstractEqualityComparison(left.toPrimitive(), right);
 
+    return false;
+  }
+
+  // If this is not overrided, its not callable
+  public TSCompletion call() {
+    assert false : "should be overwritten";
+    return TSCompletion.createNormalNull();
+  }
+
+  public boolean isReference() {
     return false;
   }
 }

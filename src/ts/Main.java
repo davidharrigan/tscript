@@ -29,7 +29,7 @@ import java.util.*;
 public class Main
 {
   /** Tracks compiler version. */
-  public static final String version = "0.01";
+  public static final String version = "0.2";
 
   private static String determineBaseFileName(String sourceFile)
   {
@@ -206,7 +206,11 @@ public class Main
         TSCompletion completion = t.apply(treeEval);
         if (!completion.isNormal())
         {
-          Message.fatal("evaluation completed abnormally!");
+          if (completion.getType() == TSCompletionType.Throw) {
+            Message.evaluationError(completion.getValue().toStr().getInternal());
+          }
+          else
+            Message.fatal("evaluation completed abnormally!");
         }
       }
     }

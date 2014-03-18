@@ -70,6 +70,11 @@ abstract class TSReference extends TSValue
   {
     return this.getValue().isUndefined();
   }
+
+  public final boolean isReference() 
+  {
+    return true;
+  }
 }
 
 

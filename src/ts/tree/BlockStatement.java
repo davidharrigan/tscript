@@ -11,11 +11,17 @@ import ts.tree.visit.TreeVisitor;
  */
 public final class BlockStatement extends Statement
 {
-	private List<Statement> statements;
+	private List<Statement> statements = null;
+	private Statement statement = null;
+
 	public BlockStatement(final Location loc, final List<Statement> statements)
 	{
 		super(loc);
-		this.statements = statements;
+
+		if (statements != null) {
+			this.statement = statements.remove(statements.size()-1);
+			this.statements = statements;
+		}
 	}
 
 	public <T> T apply(TreeVisitor<T> visitor)
@@ -26,5 +32,10 @@ public final class BlockStatement extends Statement
 	public List<Statement> getStatements() 
 	{
 		return this.statements;
+	}
+
+	public Statement getStatement() 
+	{
+		return this.statement;
 	}
 }

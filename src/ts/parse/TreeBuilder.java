@@ -2,6 +2,7 @@ package ts.parse;
 
 import java.util.List;
 
+import ts.support.TSLexicalEnvironment;
 import ts.Location;
 import ts.Message;
 import ts.tree.*;
@@ -65,7 +66,6 @@ public class TreeBuilder
     final Expression left)
   {
     Message.log("TreeBuilder: Uop " + op.toString());
-
     return new UnaryOperator(loc, op, left);
   }
 
@@ -172,7 +172,8 @@ public class TreeBuilder
 
   /** Build a block statement.
    *
-   *
+   *  @param  loc         location in source code (file, line, column)
+   *  @param  statements  statement list
    */
   public static Statement buildBlockStatement(final Location loc, 
     final List<Statement> statements)
@@ -183,7 +184,7 @@ public class TreeBuilder
 
   /** Build an empty statement
    *
-   *
+   *  @param  loc  location in source code (file, line, column)
    */
   public static Statement buildEmptyStatement(final Location loc) 
   {
@@ -193,7 +194,9 @@ public class TreeBuilder
 
   /** Build a while statement
    *
-   *
+   *  @param  loc         location in source code (file, line, column)
+   *  @param  expression  expression sub tree
+   *  @param  statements  statement list
    */
   public static Statement buildWhileStatement(final Location loc, 
     final Expression expression,
@@ -206,7 +209,10 @@ public class TreeBuilder
 
   /** Build a if statement
    *
-   *
+   *  @param  loc        location in source code (file, line, column)
+   *  @param  expression expression sub tree
+   *  @param  statement1 statement list to be evaluated if 'if' is true
+   *  @param  statement2 statement list to be evaluated if 'if' is false
    */
   public static Statement buildIfStatement(final Location loc, 
       final Expression expression,
@@ -219,7 +225,8 @@ public class TreeBuilder
 
   /** Build a break statement
    *
-   *
+   *  @param  loc   location in source code (file, line, column)
+   *  @param  name  label name, can be null
    */
   public static Statement buildBreakStatement(final Location loc,
       final String name)
@@ -229,8 +236,9 @@ public class TreeBuilder
   }
 
   /** Build a continue statement
-   *
-   *
+   * 
+   *  @param  loc   location in source code (file, line, column)
+   *  @param  name  label name, can be null
    */
   public static Statement buildContinueStatement(final Location loc,
       final String name)
@@ -241,14 +249,94 @@ public class TreeBuilder
 
   /** Build a labelled statement
    *
-   *
+   *  @param  loc        location in source code (file, line, column)
+   *  @param  name       name of the label being declared
+   *  @param  statements  list of statements to be evaluated within the label statement
    */
   public static Statement buildLabelledStatement(final Location loc,
       final String name,
-      final List<Statement> statement) 
+      final List<Statement> statements) 
   {
     Message.log("TreeBuilder: buildLablledStatement");
-    return new LabelledStatement(loc, name, statement);
+    return new LabelledStatement(loc, name, statements);
+  }
+
+  /** Build a throw statement
+   *
+   *  @param  loc         location in source code (file, line, column)
+   *  @param  expression  expression sub tree
+   */
+  public static Statement buildThrowStatement(final Location loc,
+    final Expression expression)
+  {
+    Message.log("TreeBuilder: buildThrowStatement");
+    return new ThrowStatement(loc, expression);
+  }
+
+  /** Build a Try Statement
+   *
+   *  @param  loc            location in source code (file, line, column)
+   *  @param  block          statement to be evaluated in the try statement
+   *  @param  catchClause    catchClause expression sub tree, can be null
+   *  @param  finallyClause  finallyClause expression sub tree, can be null
+   */
+  public static Statement buildTryStatement(final Location loc, 
+    final Statement block, final Expression catchClause, 
+    final Expression finallyClause)
+  {
+    Message.log("TreeBuilder: buildTryStatement");
+    return new TryStatement(loc, block, catchClause, finallyClause);
+  }
+
+  /** Build a Catch Clause
+   *
+   *  @param  loc    location in source code (file, line, column)
+   *  @param  name   name of the exception to catch
+   *  @param  block  statement to be evaluated within the clause
+   */
+  public static Expression buildCatchClause(final Location loc, 
+    final String name, final Statement block)
+  {
+    Message.log("TreeBuilder: buildCatchClause");
+    return new CatchClause(loc, name, block);
+  }
+
+  /** Build a Finally Clause
+   *
+   *  @param  loc    location in source code (file, line, column)
+   *  @param  block  statement to be evaluated within the clause
+   */
+  public static Expression buildFinallyClause(final Location loc,
+    final Statement block)
+  {
+    Message.log("TreeBuilder: buildFinallyClause");
+    return new FinallyClause(loc, block);
+  }
+
+  /** Build a Function Expression
+   *
+   *  @param  loc        location in source code (file, line, column)
+   *  @param  name       name of the function, can be null
+   *  @param  statement  code to be evaluated within the function
+   */
+  public static Expression buildFunctionExpression(final Location loc, 
+      final String name,
+      final List<Statement> statement)
+  {
+    Message.log("TreeBuilder: buildFunctionExpression");
+    return new FunctionExpression(loc, name, statement);
+  }
+
+  /** Build a Function Call
+   * 
+   *  @param  loc         location in source code (file, line, column)
+   *  @param  expression  expression sub tree
+   */
+  public static Expression buildFunctionCall(final Location loc,
+      final Expression expression)
+  {
+    Message.log("TreeBuilder: buildFunctionCall");
+    return new FunctionCall(loc, expression);
   }
 
   //

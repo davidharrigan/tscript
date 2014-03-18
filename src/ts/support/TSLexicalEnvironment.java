@@ -19,6 +19,11 @@ public final class TSLexicalEnvironment
     this.outerEnvironment = outerEnvironment;
   }
 
+  public TSLexicalEnvironment getOuterEnvironment() 
+  {
+    return outerEnvironment;
+  }
+
   /** Create a Reference
    *  (<a href="http://www.ecma-international.org/ecma-262/5.1/#sec-8.7">ELS
    *  8.7</a>)

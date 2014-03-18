@@ -36,7 +36,7 @@ public final class WhileStatement extends Statement
 		return visitor.visit(this);
 	}
 
-	public Statement getStatements() 
+	public Statement getStatement() 
 	{
 		return this.statement;
 	}

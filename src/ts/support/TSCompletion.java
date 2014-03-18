@@ -76,6 +76,17 @@ public final class TSCompletion
     return (type == TSCompletionType.Normal);
   }
 
+  public void print(String...s)
+  {
+    if (s != null) {
+      System.out.println(s);
+    }
+    String ty = (this.type == null) ? "" : this.type.toString();
+    String v  = (this.value == null) ? "" : this.value.toStr().getInternal();
+    String ta = (this.target == null) ? "" : this.target.getInternal();
+    System.out.println("[Type: ]" + ty + " [Value:] " + v + " [Target: ]" + ta);
+  }
+
 }
 
 

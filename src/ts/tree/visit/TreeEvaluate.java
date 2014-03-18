@@ -24,6 +24,16 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
   {
     environment = TSLexicalEnvironment.newDeclarativeEnvironment(null);
     environment.declareVariable(TSString.create("undefined"), false);
+
+    labelStack.push("");
+  }
+
+  public TreeEvaluate(TSLexicalEnvironment env)
+  {
+    environment = env;
+    environment.declareVariable(TSString.create("undefined"), false);
+
+    labelStack.push("");
   }
 
   // visit a list of ASTs and evaluate them in order
@@ -196,12 +206,57 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
   // ----------------------------------------------------------------
   public TSCompletion visit(final BlockStatement blockStatement)
   {
-    List<TSCompletion> ret; 
-    if (blockStatement.getStatements() == null)
+    // Block : {}
+    if (blockStatement.getStatement() == null)
       return TSCompletion.create(TSCompletionType.Normal, null, null);
-    else 
-        ret = visitEach(blockStatement.getStatements());
-      return ret.get(ret.size() - 1);
+
+    // StatementList : Statement
+    if (blockStatement.getStatements() == null)
+    {
+      TSCompletion s = visitNode(blockStatement.getStatement());
+      if (s.getType() == TSCompletionType.Throw)
+        return s;
+
+      return s;
+    }
+
+    // StatementList : StatementList Statement
+    List<TSCompletion> slList = visitEach(blockStatement.getStatements());
+    TSCompletion sl = slList.get(slList.size()-1);
+
+    // If sl is an abrupt completion, return sl
+    if (!sl.isNormal()) {
+      if (sl.getType() == TSCompletionType.Continue) {
+        String target = (sl.getTarget() == null) ? "" : sl.getTarget().toStr().getInternal();
+        
+        if (!target.equals("") && labelStack.contains(target)) {
+          labelStack.pop();
+          return TSCompletion.create(TSCompletionType.Continue, sl.getValue(), TSString.create(target));
+        }
+        return TSCompletion.createNormal(sl.getValue()); 
+      }
+        return sl;
+    }
+
+    // Let s be the result of evaluating Statement
+    TSCompletion s = visitNode(blockStatement.getStatement());
+    TSValue v = null;
+    
+    // check exceptions
+    if (s.getType() == TSCompletionType.Throw)
+      return s;
+
+    // If s.value is empty, let v = sl.value, otherwise let v = s.value
+    if (s.getValue() == null) {
+      v = sl.getValue();
+    } else {
+      v = s.getValue();
+    }
+
+    // Return (s.type, v, s.target)
+    TSString target = (s.getTarget() == null) ? null : s.getTarget().toStr();
+    TSCompletion ret = TSCompletion.create(s.getType(), v, target);
+    return ret;
   }
 
   // While Statement
@@ -209,36 +264,42 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
   public TSCompletion visit(final WhileStatement whileStatement) 
   {
     TSValue v = null;
-    while (true) {
-      TSCompletion exprRef = visitNode(whileStatement.getExpression());
-      if (exprRef.getValue().toBoolean().getInternal() == false) 
-      {
-        return TSCompletion.createNormal(v);
-      }
-      
-      TSCompletion stmt = visitNode(whileStatement.getStatement());
-      
-      if (stmt.getValue() != null) 
-      {
-        v = stmt.getValue();
-      }
+    //String curLabel = labelStack.peek();
 
-      //fix null pointer here
-      if (!stmt.getType().equals(TSCompletionType.Continue) ||
-          !stmt.getTarget().toStr().getInternal().equals(labelStack.peek().getName()))
+    while (true) {
+
+      // a. Let exprRef be the result of evaluating Expression
+      TSCompletion exprRef = visitNode(whileStatement.getExpression());
+      
+      // b. If ToBoolean(exprRef) is false, return (normal, V, empty)
+      if (exprRef.getValue().toBoolean().getInternal() == false) 
+        return TSCompletion.createNormal(v);
+
+      // c. Let stmt be the result of evaluating Statement      
+      TSCompletion stmt = visitNode(whileStatement.getStatement());
+
+      // d. If stmt.value is not empty, let V = stmt.value      
+      if (stmt.getValue() != null) 
+        v = stmt.getValue();
+
+      String target = (stmt.getTarget() == null) ? "" : stmt.getTarget().toStr().getInternal();
+
+      // e. 
+      if (stmt.getType() != TSCompletionType.Continue ||
+          !labelStack.contains(target))
       {
-        if (stmt.getType() == TSCompletionType.Break &&
-            stmt.getTarget().toStr().getInternal().equals(labelStack.peek().getName())) {//&& something about label)
-          System.out.println("Label is : " + labelStack.peek().getName());
-          return TSCompletion.createNormal(v);
+        if (stmt.getType() == TSCompletionType.Break)
+        {
+          if (target.equals(""))
+            return TSCompletion.createNormal(v);
+          if (labelStack.contains(target)) 
+            return TSCompletion.create(TSCompletionType.Break, v, TSString.create(target));
         }
         
-        if (stmt.getType() != TSCompletionType.Normal) {
-          System.out.println("abrupt completion in while");
+        if (!stmt.isNormal()) {
           return stmt;
         }
       }
-      
     }
   }
 
@@ -267,6 +328,7 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
         null, 
         null);
     }
+
     return TSCompletion.create(TSCompletionType.Continue, 
       null, 
       TSString.create(continueStatement.getName()));
@@ -276,16 +338,18 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
   // ----------------------------------------------------------------
   public TSCompletion visit(final LabelledStatement labelledStatement)
   {
-    TSCompletion stmt = visitNode(labelledStatement.getStatement());
-    this.labelStack.pop();     
+    labelStack.push(labelledStatement.getName());
+    TSCompletion stmt = visitNode(labelledStatement.getStatement());  
+    String curLabel = (labelStack.size() == 1) ? "" : labelStack.pop();
 
-    if (stmt.getType() == TSCompletionType.Break && 
+    if (stmt.getType() == TSCompletionType.Break  && 
+        stmt.getTarget() != null &&
         stmt.getTarget().toStr().getInternal().equals(labelledStatement.getName())) 
     {
-
       return TSCompletion.createNormal(stmt.getValue());
     }
-    return TSCompletion.createNormalNull();
+
+    return stmt;
   }
 
   // If Statement
@@ -325,6 +389,128 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
   public TSCompletion visit(final EmptyStatement emptyStatement) 
   {
       return TSCompletion.createNormalNull();
+  }
+
+  // Throw Statement
+  // ----------------------------------------------------------------
+  public TSCompletion visit(final ThrowStatement throwStatement)
+  {
+    Message.setLocation(throwStatement.getLoc());
+    TSCompletion exprRef = visitNode(throwStatement.getExpression());
+    return TSCompletion.create(TSCompletionType.Throw, exprRef.getValue(), null);
+  }
+
+  // Try Statement
+  // ----------------------------------------------------------------
+  public TSCompletion visit(final TryStatement tryStatement)
+  {
+    TSCompletion b, c, f;
+    Statement  block = tryStatement.getStatement();
+    CatchClause catchClause   = tryStatement.getCatchClause();
+    Expression finallyClause = tryStatement.getFinallyClause();
+
+    if (catchClause != null && finallyClause == null)
+    {
+      b = visitNode(block);
+
+      if (b.getType() != TSCompletionType.Throw)
+        return b;
+
+      catchClause.passParameter(b.getValue());
+      return visitNode(catchClause);
+    }
+
+    if (catchClause == null && finallyClause != null)
+    {
+      b = visitNode(block);
+      f = visitNode(finallyClause);
+      if (f.getType() == TSCompletionType.Normal)
+        return b;
+      return f;
+    }
+
+    b = visitNode(block);
+    
+    if (b.getType() == TSCompletionType.Throw)
+    {
+      catchClause.passParameter(b.getValue());
+      c = visitNode(catchClause);
+     
+     // c.setValue(b.getValue());    //??
+    } 
+    else {
+      c = b;
+    }
+
+    f = visitNode(finallyClause);
+    if (f.getType() == TSCompletionType.Normal)
+      return c;
+    return f;
+  }
+
+  // Catch Clause
+  // ----------------------------------------------------------------
+  public TSCompletion visit(final CatchClause catchClause)
+  {
+    String name     = catchClause.getName();
+    Statement block = catchClause.getStatement();
+    TSValue c       = catchClause.getParam();
+
+    TSLexicalEnvironment oldEnv   = this.environment;
+    TSLexicalEnvironment catchEnv = TSLexicalEnvironment.newDeclarativeEnvironment(oldEnv);
+
+    catchEnv.declareParameter(name, c);
+
+    this.environment = catchEnv;
+    TSCompletion b = visitNode(block);
+    this.environment = oldEnv;
+    return b;
+  }
+
+  // Finally Clause
+  // ----------------------------------------------------------------
+  public TSCompletion visit(final FinallyClause finallyClause)
+  {
+    return visitNode(finallyClause.getStatement());
+  }
+
+
+  // 
+  // ----------------------------------------------------------------
+  public TSCompletion visit(final FunctionCall functionCall)
+  {
+    /*
+    // assume primary exp for now
+    TSCompletion ref = visitNode(functionCall.getExpression());
+    //ref.print();
+    TSFunctionObject func = ref.getValue();
+
+    // arg list
+
+    if (!(func instanceof TSObject))
+    {
+      System.out.println("throw type err");
+    }
+
+    // check if callable
+
+    TSValue thisValue;
+      //if (ref.isPropertyReference())
+        thisValue = ref.getValue();
+      //System.out.println(thisValue.toStr().getInternal());
+      //return thisValue.call();
+      return func.call();
+    */
+      return TSCompletion.createNormalNull();
+
+  }
+
+  public TSCompletion visit(final FunctionExpression functionExpression)
+  {
+    String name = functionExpression.getName();
+    List<Statement> body = functionExpression.getBody();
+
+    return TSCompletion.createNormal(TSFunctionObject.create(name, body, this.environment));
   }
 }
 

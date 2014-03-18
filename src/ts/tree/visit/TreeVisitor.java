@@ -12,7 +12,7 @@ import ts.tree.*;
  */
 public interface TreeVisitor<T>
 {
-  Stack<LabelledStatement> labelStack = new Stack<LabelledStatement>();
+  Stack<String> labelStack = new Stack<String>();
 
   T visit(BinaryOperator binaryOperator);
 
@@ -47,5 +47,17 @@ public interface TreeVisitor<T>
   T visit(ContinueStatement continueStatement);
 
   T visit(LabelledStatement labelledStatement);
+
+  T visit(ThrowStatement throwStatement);
+
+  T visit(TryStatement tryStatement);
+
+  T visit(CatchClause catchClause);
+
+  T visit(FinallyClause finallyClause);
+
+  T visit(FunctionExpression functionExpression);
+
+  T visit(FunctionCall functionCall);
 }
 

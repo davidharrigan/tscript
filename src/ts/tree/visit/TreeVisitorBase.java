@@ -101,7 +101,6 @@ public class TreeVisitorBase<T> implements TreeVisitor<T>
 
   public T visit(final WhileStatement whileStatement) 
   {
-    System.out.println("lol");
     return null;
   }
 
@@ -121,6 +120,36 @@ public class TreeVisitorBase<T> implements TreeVisitor<T>
   }
 
   public T visit(final LabelledStatement labelledStatement)
+  {
+    return null;
+  }
+
+  public T visit(final ThrowStatement throwStatement)
+  {
+    return null;
+  }
+
+  public T visit(final TryStatement tryStatement)
+  {
+    return null;
+  }
+
+  public T visit(final CatchClause catchClause)
+  {
+    return null;
+  }
+
+  public T visit(final FinallyClause finallyClause)
+  {
+    return null;
+  }
+
+  public T visit(final FunctionExpression functionExpression)
+  {
+    return null;
+  }
+
+  public T visit(final FunctionCall functionCall)
   {
     return null;
   }
