@@ -24,6 +24,26 @@ public final class TSLexicalEnvironment
     return outerEnvironment;
   }
 
+  public void createMutableBinding(String name) 
+  {
+    environmentRecord.createMutableBinding(TSString.create(name), false);
+  }
+
+  public void setMutableBinding(String name, TSValue value)
+  {
+    environmentRecord.setMutableBinding(TSString.create(name), value);
+  }
+
+  public void createImmutableBinding(String name)
+  {
+    environmentRecord.createImmutableBinding(TSString.create(name));
+  }
+
+  public void initializeImmutableBinding(String name, TSValue value)
+  {
+    environmentRecord.initializeImmutableBinding(TSString.create(name), value);
+  }
+
   /** Create a Reference
    *  (<a href="http://www.ecma-international.org/ecma-262/5.1/#sec-8.7">ELS
    *  8.7</a>)

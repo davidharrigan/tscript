@@ -36,5 +36,10 @@ public abstract class TSEnvironmentRecord
 
   /** Return the implicit "this" value for this environment. */
   abstract TSValue implicitThisValue();
+
+  
+  abstract void createImmutableBinding(TSString name);
+  
+  abstract void initializeImmutableBinding(TSString name, TSValue value);
 }
 

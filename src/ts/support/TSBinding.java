@@ -14,7 +14,6 @@ final class TSBinding
   private TSValue value;
 
   private final boolean isDeletable;
-
   private final boolean isImmutable;
 
   TSBinding(final TSValue value, final boolean isDeletable,

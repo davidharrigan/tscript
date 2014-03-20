@@ -447,7 +447,7 @@ public abstract class TSValue
     return TSCompletion.createNormalNull();
   }
 
-  public boolean isReference() {
+  public boolean isCallable() {
     return false;
   }
 }

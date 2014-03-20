@@ -55,7 +55,6 @@ public final class TreeDump extends TreeVisitorBase<Object>
   {
     for (final Object node : nodes)
     {
-      indent();
       visitNode((Tree) node);
     }
     return null;
@@ -71,6 +70,17 @@ public final class TreeDump extends TreeVisitorBase<Object>
     indentation -= increment;
     return null;
   }
+
+  public Object visit(final UnaryOperator unaryOperator)
+  {
+    indent();
+    writer.println(unaryOperator.getOpString());
+    indentation += increment;
+    visitNode(unaryOperator.getLeft());
+    indentation -= increment;
+    return null;
+  }
+
 
   public Object visit(final ExpressionStatement expressionStatement)
   {
@@ -113,11 +123,37 @@ public final class TreeDump extends TreeVisitorBase<Object>
     return null;
   }
 
+  public Object visit(final BooleanLiteral boolLiteral)
+  {
+    indent();
+    writer.println("BooleanLiteral " + boolLiteral.getValue());
+    return null;
+  }
+
+  public Object visit(final StringLiteral stringLiteral)
+  {
+    indent();
+    writer.println("StringLiteral " + stringLiteral.getValue());
+    return null;
+  }
+
+  public Object visit(final NullLiteral nullLiteral)
+  {
+    indent();
+    writer.println("NullLiteral ");
+    return null;
+  }
+
   public Object visit(final BlockStatement blockStatement) 
   {
     indent();
     writer.println("BlockStatement");
-    visitEach(blockStatement.getStatements());
+    indentation += increment;
+    if (blockStatement.getStatements() != null) 
+      visitEach(blockStatement.getStatements());
+    if (blockStatement.getStatement() != null)
+    visitNode(blockStatement.getStatement());
+    indentation -= increment;
     return null;
   }
 
@@ -127,5 +163,136 @@ public final class TreeDump extends TreeVisitorBase<Object>
     writer.println("EmptyStatement");
     return null;
   }
+
+  public Object visit(final WhileStatement whileStatement)
+  {
+    indent();
+    writer.println("WhileStatement");
+    indentation += increment;
+    visitNode(whileStatement.getExpression());
+    visitNode(whileStatement.getStatement());
+    indentation -= increment;
+    return null;
+  }
+
+  public Object visit(final IfStatement ifStatement)
+  {
+    indent();
+    writer.println("IfStatement");
+    indentation += increment;
+    visitNode(ifStatement.getExpression());
+    visitNode(ifStatement.getStatement1());
+    if (ifStatement.getStatement2() != null)
+      visitNode(ifStatement.getStatement2());
+    indentation += increment;
+    return null;
+  }
+
+  public Object visit(final BreakStatement breakStatement)
+  {
+    indent();
+    String name = (breakStatement.getName() == null) ? "" : breakStatement.getName();
+    writer.println("BreakStatement " + name);
+    return null;
+  }
+  
+  public Object visit(final ContinueStatement continueStatement)
+  {
+    indent();
+    String name = (continueStatement.getName() == null) ? "" : continueStatement.getName();
+    writer.println("ContinueStatement " + name);
+    return null;
+  }
+  
+  public Object visit(final LabelledStatement labelledStatement)
+  {
+    indent();
+    String name = labelledStatement.getName();
+    Statement s = labelledStatement.getStatement();
+    writer.println("LabelledStatement " + name);
+    indentation += increment;
+    visitNode(s);
+    indentation -= increment;
+    return null;
+  }
+  
+  public Object visit(final ThrowStatement throwStatement)
+  {
+    indent();
+    writer.println("ThrowStatement");
+    indentation += increment;
+    visitNode(throwStatement.getExpression());
+    indentation -= increment;
+    return null;
+  }
+  
+  public Object visit(final TryStatement tryStatement)
+  {
+    indent();
+    writer.println("TryStatement");
+    indentation += increment;
+    visitNode(tryStatement.getStatement());
+    Expression c = tryStatement.getCatchClause();
+    Expression f = tryStatement.getFinallyClause();
+    if (c != null)
+      visitNode(c);
+    if (f != null)
+      visitNode(c);
+    indentation -= increment;
+    return null;
+  }
+  
+  public Object visit(final CatchClause catchClause)
+  {
+    indent();
+    writer.println("CatchClause " + catchClause.getName());
+    indentation += increment;
+    visitNode(catchClause.getStatement());
+    indentation -= increment;
+    return null;
+  }
+  
+  public Object visit(final FinallyClause finallyClause)
+  {
+    indent();
+    writer.println("FinallyClause");
+    indentation += increment;
+    visitNode(finallyClause.getStatement());
+    indentation -= increment;
+    return null;
+  }
+    
+  public Object visit(final FunctionExpression functionExpression)
+  {
+    String n = (functionExpression.getName() == null) ? "" : functionExpression.getName();
+    indent();
+    writer.println("FunctionExpression " + n);
+    indentation += increment;
+    visitEach(functionExpression.getBody());
+    indentation -= increment;
+    return null;
+  }
+  
+  public Object visit(final FunctionCall functionCall)
+  {
+    indent();
+    writer.println("FunctionCall");
+    indentation += increment;
+    visitNode(functionCall.getExpression());
+    indentation -= increment;
+    return null;
+  }
+
+  public Object visit(final ReturnStatement returnStatement)
+  {
+    indent();
+    writer.println("ReturnStatement");
+    indentation += increment;
+    if (returnStatement.getExpression() != null)
+      visitNode(returnStatement.getExpression());
+    indentation -= increment;
+    return null;
+  }
+
 }
 

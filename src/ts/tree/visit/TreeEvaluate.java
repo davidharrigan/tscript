@@ -435,8 +435,6 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
     {
       catchClause.passParameter(b.getValue());
       c = visitNode(catchClause);
-     
-     // c.setValue(b.getValue());    //??
     } 
     else {
       c = b;
@@ -452,14 +450,16 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
   // ----------------------------------------------------------------
   public TSCompletion visit(final CatchClause catchClause)
   {
-    String name     = catchClause.getName();
+    TSString name   = TSString.create(catchClause.getName());
     Statement block = catchClause.getStatement();
     TSValue c       = catchClause.getParam();
 
     TSLexicalEnvironment oldEnv   = this.environment;
     TSLexicalEnvironment catchEnv = TSLexicalEnvironment.newDeclarativeEnvironment(oldEnv);
 
-    catchEnv.declareParameter(name, c);
+    //catchEnv.createMutableBinding(name);
+    //catchEnv.setMutableBinding(name, c);
+    catchEnv.declareParameter(name.getInternal(), c);
 
     this.environment = catchEnv;
     TSCompletion b = visitNode(block);
@@ -475,42 +475,52 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
   }
 
 
-  // 
+  // Function Call
   // ----------------------------------------------------------------
   public TSCompletion visit(final FunctionCall functionCall)
   {
-    /*
-    // assume primary exp for now
     TSCompletion ref = visitNode(functionCall.getExpression());
-    //ref.print();
-    TSFunctionObject func = ref.getValue();
+    TSValue func = ref.getValue();
+    TSString typeError = TSString.create("TypeError");
 
-    // arg list
-
-    if (!(func instanceof TSObject))
+    if (!(func instanceof TSObject) || !func.isCallable()) 
     {
-      System.out.println("throw type err");
+      Message.setLocation(functionCall.getLoc());
+      return TSCompletion.create(TSCompletionType.Throw, typeError, null);
     }
-
-    // check if callable
-
-    TSValue thisValue;
-      //if (ref.isPropertyReference())
-        thisValue = ref.getValue();
-      //System.out.println(thisValue.toStr().getInternal());
-      //return thisValue.call();
-      return func.call();
-    */
-      return TSCompletion.createNormalNull();
-
+   
+    return func.getValue().call();
   }
 
+  // Function Expression
+  // ----------------------------------------------------------------
   public TSCompletion visit(final FunctionExpression functionExpression)
   {
     String name = functionExpression.getName();
     List<Statement> body = functionExpression.getBody();
 
-    return TSCompletion.createNormal(TSFunctionObject.create(name, body, this.environment));
+    if (name == null)
+      return TSCompletion.createNormal(TSFunctionObject.create(name, body, this.environment));
+
+    TSLexicalEnvironment funcEnv = TSLexicalEnvironment.newDeclarativeEnvironment(this.environment);
+    
+    funcEnv.createImmutableBinding(name);
+    TSFunctionObject closure = TSFunctionObject.create(name, body, funcEnv);
+    funcEnv.initializeImmutableBinding(name, closure);
+
+    return TSCompletion.createNormal(closure);
+  }
+
+  //  Return Statement
+  // ----------------------------------------------------------------
+  public TSCompletion visit(final ReturnStatement returnStatement)
+  {
+    Expression exp = returnStatement.getExpression();
+    if (exp == null)
+      return TSCompletion.create(TSCompletionType.Return, TSUndefined.value, null);
+
+    TSCompletion expRef = visitNode(exp);
+    return TSCompletion.create(TSCompletionType.Return, expRef.getValue(), null);
   }
 }
 

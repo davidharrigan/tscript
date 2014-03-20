@@ -339,6 +339,17 @@ public class TreeBuilder
     return new FunctionCall(loc, expression);
   }
 
+  /** Build a Return Statement
+   *
+   *  @param loc         location in source code (file, line, column)
+   *  @param expression  the value to be returned, can be null
+   */
+  public static Statement buildReturnStatement(final Location loc,
+    final Expression expression)
+  {
+    Message.log("TreeBuilder: buildReturnStatement");
+    return new ReturnStatement(loc, expression);
+  }
   //
   // methods to detect "early" (i.e. semantic) errors
   //

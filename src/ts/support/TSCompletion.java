@@ -61,7 +61,7 @@ public final class TSCompletion
     this.value = value;
   }
 
-  public TSValue getTarget()
+  public TSString getTarget()
   {
     return target;
   }

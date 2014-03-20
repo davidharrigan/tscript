@@ -13,16 +13,16 @@ package ts.support;
  * </ul>
  *
  */
-abstract class TSReference extends TSValue
+public abstract class TSReference extends TSObject
 {
   private final TSString name;
 
-  TSReference(final TSString name)
+  public TSReference(final TSString name)
   {
     this.name = name;
   }
 
-  TSString getReferencedName()
+  public TSString getReferencedName()
   {
     return name;
   }
@@ -72,6 +72,11 @@ abstract class TSReference extends TSValue
   }
 
   public final boolean isReference() 
+  {
+    return true;
+  }
+
+  public final boolean isCallable() 
   {
     return true;
   }

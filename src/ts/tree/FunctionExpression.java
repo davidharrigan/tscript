@@ -1,5 +1,7 @@
 package ts.tree;
 
+import ts.support.TSFunctionObject;
+
 import java.util.List;
 
 import ts.Location;
