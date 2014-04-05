@@ -7,7 +7,12 @@ var g;
 
 i = 1;
 j = 3;
-f = function () { var i; i = 17;  g = function () { print(i + j);};  g();};
+f = function () { 
+	var i; 
+	i = 17;  
+	g = function () { print(i + j); };  
+	g();
+};
 
 f();
 i = 6;

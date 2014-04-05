@@ -32,3 +32,11 @@ while (n > 0)
   n = n - 1;
 }
 
+try {
+  throw 2000;
+}
+catch (e)
+{
+  print (e);
+}
+
