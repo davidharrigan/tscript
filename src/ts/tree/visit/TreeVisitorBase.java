@@ -158,5 +158,15 @@ public class TreeVisitorBase<T> implements TreeVisitor<T>
   {
     return null;
   }
+
+  public T visit(final NewExpression newExpression)
+  {
+    return null;
+  }
+
+  public T visit(final PropertyAccessor propertyAccessor)
+  {
+    return null;
+  }
 } 
 

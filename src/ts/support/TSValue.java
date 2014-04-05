@@ -450,5 +450,9 @@ public abstract class TSValue
   public boolean isCallable() {
     return false;
   }
+
+  public boolean isPrimitive() {
+    return false;
+  }
 }
 

@@ -294,5 +294,26 @@ public final class TreeDump extends TreeVisitorBase<Object>
     return null;
   }
 
+  public Object visit(final NewExpression newExpression)
+  {
+    indent();
+    writer.println("NewExpression");
+    indentation += increment;
+    if (newExpression.getExpression() != null)
+      visitNode(newExpression.getExpression());
+    indentation -= increment;
+    return null;
+  }
+
+  public Object visit(final PropertyAccessor p)
+  {
+    indent();
+    writer.println("PropertyAccessor");
+    indentation += increment;
+    writer.println(p.getName());
+    visitNode(p.getExpression());
+    indentation -= increment;
+    return null;
+  }
 }
 

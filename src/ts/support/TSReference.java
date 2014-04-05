@@ -15,10 +15,11 @@ package ts.support;
  */
 public abstract class TSReference extends TSObject
 {
-  private final TSString name;
+  protected final TSString name;
 
   public TSReference(final TSString name)
   {
+    super(null);
     this.name = name;
   }
 
@@ -42,13 +43,13 @@ public abstract class TSReference extends TSObject
    * (not public as not used outside of package)<br>
    * (type hint not supported)
    */
-  final TSPrimitive toPrimitive()
+  protected TSPrimitive toPrimitive()
   {
     return this.getValue().toPrimitive();
   }
 
   /** Get value from reference and convert it to number type. */
-  public final TSNumber toNumber()
+  public TSNumber toNumber()
   {
     return this.getValue().toNumber();
   }

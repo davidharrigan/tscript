@@ -6,6 +6,9 @@ package ts.support;
  */
 public abstract class TSPrimitive extends TSValue
 {
+	public boolean isPrimitive() {
+		return true;
+	}
 }
 
 

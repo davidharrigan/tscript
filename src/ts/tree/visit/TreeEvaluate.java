@@ -522,5 +522,47 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
     TSCompletion expRef = visitNode(exp);
     return TSCompletion.create(TSCompletionType.Return, expRef.getValue(), null);
   }
+
+  //  New Expression
+  // ----------------------------------------------------------------
+  public TSCompletion visit(final NewExpression newExpression)
+  {
+    TSValue ref = visitNode(newExpression.getExpression()).getValue();
+    TSValue constructor = ref.getValue();
+
+    /*
+    if (!(constructor instanceof TSObject)) {
+      TSString typeError = TSString.create("TypeError");
+      Message.setLocation(newExpression.getLoc());
+      return TSCompletion.create(TSCompletionType.Throw, typeError, null);
+    }
+    */
+
+    if (constructor instanceof TSObject) {    
+      TSValue prototype = ((TSObject) constructor).getProperty(TSString.create("prototype"));
+      if (prototype instanceof TSObject)
+        return TSCompletion.createNormal(TSObject.create((TSObject) prototype));
+    }
+    return TSCompletion.createNormal(TSObject.create());
+  }
+
+  // Property Accessor
+  // ----------------------------------------------------------------
+  public TSCompletion visit(final PropertyAccessor propertyAccessor)
+  {
+    TSValue baseRef = visitNode(propertyAccessor.getExpression()).getValue();
+    TSValue baseValue = baseRef.getValue();
+    TSString propertyName = TSString.create(propertyAccessor.getName());
+
+    if (!(baseValue instanceof TSObject)) {
+      TSString typeError = TSString.create("TypeError");
+      Message.setLocation(propertyAccessor.getLoc());
+      return TSCompletion.create(TSCompletionType.Throw, typeError, null);
+    }
+
+    TSPropertyReference reference = new TSPropertyReference(propertyName, baseValue);
+
+    return TSCompletion.createNormal(reference);
+  }
 }
 

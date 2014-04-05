@@ -350,6 +350,33 @@ public class TreeBuilder
     Message.log("TreeBuilder: buildReturnStatement");
     return new ReturnStatement(loc, expression);
   }
+
+  /** Build a New Expression
+   *
+   * @param loc         location in source code (file, line, column)
+   * @param expression  expression sub tree
+   */ 
+  public static Expression buildNewExpression(final Location loc,
+    final Expression expression, final boolean isMember)
+  {
+    Message.log("TreeBuilder: buildNewExpression");
+    return new NewExpression(loc, expression, isMember);
+  }
+
+  /** Build a Property Accessor
+   *
+   *
+   * @param loc         location in source code (file, line, column)
+   * @param expression  expression sub tree
+   * @param name        name of the identifier
+   */
+  public static Expression buildPropertyAccessor(final Location loc,
+    final Expression expression, final String name)
+  {
+    Message.log("TreeBuilder: buildPropertyAccessor");
+    return new PropertyAccessor(loc, expression, name);
+  }
+
   //
   // methods to detect "early" (i.e. semantic) errors
   //
@@ -358,6 +385,10 @@ public class TreeBuilder
   private static boolean producesReference(Node node)
   {
     if (node instanceof Identifier)
+    {
+      return true;
+    }
+    if (node instanceof PropertyAccessor)
     {
       return true;
     }

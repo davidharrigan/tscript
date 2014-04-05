@@ -61,5 +61,9 @@ public interface TreeVisitor<T>
   T visit(FunctionCall functionCall);
 
   T visit(ReturnStatement returnStatement);
+
+  T visit(NewExpression newExpression);
+
+  T visit(PropertyAccessor propertyAccessor);
 }
 

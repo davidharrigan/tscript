@@ -6,7 +6,11 @@ import ts.tree.visit.*;
 import ts.Message;
 
 import java.util.List;
-
+/**
+ * Class to represent function objets. 
+ * <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-13.2">ELS 13.2</a>
+ * 
+ */
 public final class TSFunctionObject extends TSObject
 {
 	private final String name;
@@ -16,7 +20,7 @@ public final class TSFunctionObject extends TSObject
 	private TSFunctionObject(String name, List<Statement> code,
 		TSLexicalEnvironment scope)
 	{
-		//super(this);
+		super(null);
 		this.name = name;
 		this.code = code;
 		this.scope = scope;
@@ -28,6 +32,10 @@ public final class TSFunctionObject extends TSObject
 		return new TSFunctionObject(name, body, oldEnv);
 	}
 
+	/**
+	 * Function call method
+	 * <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-13.2.1">ELS 13.2.1</a>
+	 */
 	public final TSCompletion call() 
 	{
 		TSLexicalEnvironment localEnv = TSLexicalEnvironment.newDeclarativeEnvironment(scope);
@@ -48,7 +56,6 @@ public final class TSFunctionObject extends TSObject
 	        }
 	    }
 	    return TSCompletion.createNormal(TSUndefined.value);
-		
 	}
 
 	public final TSString toStr() 

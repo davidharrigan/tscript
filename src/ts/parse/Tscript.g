@@ -87,6 +87,9 @@ statement
   | tr=tryStatement
     { $lval = new ArrayList<Statement>();
       $lval.add($tr.lval); }
+  | re=returnStatement
+    { $lval = new ArrayList<Statement>();
+      $lval.add($re.lval); }
   ;
 
 // Block Statement 
@@ -289,12 +292,18 @@ newExpression
   returns [ Expression lval ]
   : m=memberExpression
     { $lval = $m.lval; }
+  | 'new' n=newExpression
+    { $lval = buildNewExpression(loc($start), $n.lval, false); }
   ;
 
 callExpression
   returns [ Expression lval ]
   : m=memberExpression arguments
     { $lval = buildFunctionCall(loc($start), $m.lval); }
+  | c=callExpression arguments
+    { $lval = buildFunctionCall(loc($start), $m.lval); } // check this later
+  | c=callExpression '.' IDENTIFIER
+    { $lval = buildPropertyAccessor(loc($start), $c.lval, $IDENTIFIER.text); }
   ;
 
 memberExpression
@@ -303,12 +312,16 @@ memberExpression
     { $lval = $p.lval; }
   | f=functionExpression
     { $lval = $f.lval; }
+  | m=memberExpression '.' IDENTIFIER
+    { $lval = buildPropertyAccessor(loc($start), $m.lval, $IDENTIFIER.text); }
+  | 'new' m=memberExpression arguments
+    { $lval = buildNewExpression(loc($start), $m.lval, true); }
   ;
 
 functionExpression
   returns [ Expression lval ]
   : 'function' LPAREN RPAREN '{' f=functionBody '}'
-    { $lval = buildFunctionExpression(loc($start), "", $f.lval); }
+    { $lval = buildFunctionExpression(loc($start), null, $f.lval); }
   | 'function' IDENTIFIER LPAREN RPAREN '{' f=functionBody '}'
     { $lval = buildFunctionExpression(loc($start), $IDENTIFIER.text, $f.lval); }
 
@@ -319,7 +332,12 @@ functionExpression
 
 arguments
   : LPAREN RPAREN
-  //| LPAREN argumentList RPAREN
+  | LPAREN argumentList RPAREN
+  ;
+
+argumentList
+  : assignmentExpression
+  | argumentList COMMA assignmentExpression
   ;
 
 functionBody
@@ -332,6 +350,15 @@ functionBody
       $lval = $sl.lval;
     }
   ;
+
+returnStatement
+  returns [ Statement lval ]
+  : 'return' SEMICOLON
+    { $lval = buildReturnStatement(loc($start), null); }
+  | 'return' e=expression SEMICOLON
+    { $lval = buildReturnStatement(loc($start), $e.lval); }
+  ;
+
 /*
 functionDeclaration
   : 'function' IDENTIFIER LPAREN RPAREN '{' functionBody '}'
