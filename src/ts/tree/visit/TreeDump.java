@@ -315,5 +315,15 @@ public final class TreeDump extends TreeVisitorBase<Object>
     indentation -= increment;
     return null;
   }
+
+  public Object visit(final Arguments a)
+  {
+    indent();
+    writer.println("Arguments");
+    indentation += increment;
+    visitEach(a.getArgumentList());
+    indentation -= increment;
+    return null;
+  }
 }
 

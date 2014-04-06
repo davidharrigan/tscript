@@ -19,11 +19,14 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
   // this is a declarative environment for now
   // TODO: change to an environment for the global object
   private TSLexicalEnvironment environment;
+  private TSLexicalEnvironment globalEnvironment;
 
   public TreeEvaluate()
   {
-    environment = TSLexicalEnvironment.newDeclarativeEnvironment(null);
-    environment.declareVariable(TSString.create("undefined"), false);
+   // TSEnvironmentRecord.global = TSLexicalEnvironment.newObjectEnvironment(null);
+    globalEnvironment = TSLexicalEnvironment.newObjectEnvironment(
+      TSEnvironmentRecord.global, null);
+    environment = TSLexicalEnvironment.newDeclarativeEnvironment(globalEnvironment);
 
     labelStack.push("");
   }
@@ -31,7 +34,6 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
   public TreeEvaluate(TSLexicalEnvironment env)
   {
     environment = env;
-    environment.declareVariable(TSString.create("undefined"), false);
 
     labelStack.push("");
   }

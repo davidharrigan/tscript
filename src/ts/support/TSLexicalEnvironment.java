@@ -148,5 +148,15 @@ public final class TSLexicalEnvironment
       outer);
   }
 
+  /** Create a new object envionment
+   *
+   */
+  public static TSLexicalEnvironment newObjectEnvironment(
+    final TSObject object, final TSLexicalEnvironment outer)
+  {
+    return new TSLexicalEnvironment(new TSObjectEnvironmentRecord(object),
+      outer);
+  }
+
 }
 

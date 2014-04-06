@@ -9,12 +9,14 @@ package ts.support;
  * The subclasses are:
  * <ul>
  * <li> declarative environment records
- * <li> object environment records (not implemented yet)
+ * <li> object environment records
  * </ul>
  *
  */
 public abstract class TSEnvironmentRecord
 {
+  public static TSObject global = TSGlobalObject.create();
+
   /** Does the environment have a binding for this name? */
   abstract boolean hasBinding(TSString name);
 
@@ -32,12 +34,11 @@ public abstract class TSEnvironmentRecord
    *
    *  @return success or failure. TODO: return value should be TSBoolean.
    */
-  abstract TSNumber deleteBinding(TSString name);
+  abstract TSBoolean deleteBinding(TSString name);
 
   /** Return the implicit "this" value for this environment. */
   abstract TSValue implicitThisValue();
 
-  
   abstract void createImmutableBinding(TSString name);
   
   abstract void initializeImmutableBinding(TSString name, TSValue value);

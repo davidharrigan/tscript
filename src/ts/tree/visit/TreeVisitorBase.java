@@ -168,5 +168,10 @@ public class TreeVisitorBase<T> implements TreeVisitor<T>
   {
     return null;
   }
+
+  public T visit(final Arguments args)
+  {
+    return null;
+  }
 } 
 

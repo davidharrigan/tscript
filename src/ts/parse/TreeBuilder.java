@@ -377,6 +377,19 @@ public class TreeBuilder
     return new PropertyAccessor(loc, expression, name);
   }
 
+  /** Build Arguments
+   *
+   *
+   * @param loc     location in source code (file, line, column)
+   * @param argList argument list
+   */
+  public static Expression buildArguments(final Location loc,
+    final List<Expression> argList)
+  {
+    Message.log("TreeBuilder: buildArguments");
+    return new Arguments(loc, argList);
+  }
+
   //
   // methods to detect "early" (i.e. semantic) errors
   //

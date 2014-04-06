@@ -42,6 +42,17 @@ public class TSObject extends TSValue
 		properties.put(name, value);
 	}
 
+	public boolean hasProperty(TSString name)
+	{
+		if (properties.get(name) != null){
+			return true;
+		}
+		if (prototype != null){
+			return prototype.hasProperty(name);
+		}
+		return false;
+	}
+
 	public TSValue getProperty(TSString name)
 	{
 		TSValue ret = properties.get(name);
@@ -52,6 +63,11 @@ public class TSObject extends TSValue
 			ret = TSUndefined.value;
 		}
 		return ret;
+	}
+
+	public boolean deleteProperty(TSString name)
+	{
+		return (properties.remove(name) != null);
 	}
 
 	private TSValue getDefaultValue(int hint) 

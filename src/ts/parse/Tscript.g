@@ -331,13 +331,23 @@ functionExpression
 
 
 arguments
+  returns [ Expression lval ] 
   : LPAREN RPAREN
-  | LPAREN argumentList RPAREN
+  | LPAREN a=argumentList RPAREN
+    { $lval = buildArguments(loc($start), $a.lval); }
   ;
 
 argumentList
-  : assignmentExpression
-  | argumentList COMMA assignmentExpression
+  returns [ List<Expression> lval ]
+  : { $lval = new ArrayList<Expression>(); } 
+  | ae=assignmentExpression
+    { $lval.add($ae.lval); }
+  | al=argumentList COMMA ae=assignmentExpression
+    { $lval.add($ae.lval); 
+      for (Expression e: $al.lval) {
+        $lval.add(e);
+      }
+    }
   ;
 
 functionBody

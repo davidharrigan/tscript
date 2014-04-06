@@ -47,9 +47,6 @@ final class TSDeclarativeEnvironmentRecord extends TSEnvironmentRecord
   {
     TSBinding binding = map.get(name);
 
-    // need to remove this assertion and add evaluation error
-    // this is because assignment to a non-existing variable will
-    // be routed here
     // TODO: revert code when undefined identifier results in a
     // property reference rather than an environment reference
     //assert (binding != null) : "missing binding";
@@ -87,7 +84,7 @@ final class TSDeclarativeEnvironmentRecord extends TSEnvironmentRecord
    *  @return success (1) or failure (0). TODO: the return type should be
    *  TSBoolean.
    */
-  TSNumber deleteBinding(final TSString name)
+  TSBoolean deleteBinding(final TSString name)
   {
     assert false : "not implemented";
     return null;

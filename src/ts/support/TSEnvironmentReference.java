@@ -30,7 +30,7 @@ final class TSEnvironmentReference extends TSReference
     // TSLexicalEnvironment.getIdentifierReference creates a property descriptor
     // with an undefined base if the identifier cannot be resolved.
     //return false;
-    return (base == null);
+    return base == null;
   }
 
   /** Environment references cannot be property references so this always
@@ -63,13 +63,12 @@ final class TSEnvironmentReference extends TSReference
   /** Assign a value to the name specified by the Reference. */
   public void putValue(final TSValue value)
   {
-    if (base == null)
-    {
-      Message.evaluationError("undefined identifier: " +
-        this.getReferencedName().getInternal());
+    if (isUnresolvableReference()) {
+      TSEnvironmentRecord.global.putProperty(this.getReferencedName(), value);
     }
-    base.setMutableBinding(this.getReferencedName(), value);
-    return;
+    else {
+      base.setMutableBinding(this.getReferencedName(), value);
+    }
   }
 
 }
