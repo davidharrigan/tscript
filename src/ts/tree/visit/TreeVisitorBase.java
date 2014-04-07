@@ -164,12 +164,22 @@ public class TreeVisitorBase<T> implements TreeVisitor<T>
     return null;
   }
 
+  public T visit(final MemberExpression memberExpression)
+  {
+    return null;
+  }
+
   public T visit(final PropertyAccessor propertyAccessor)
   {
     return null;
   }
 
   public T visit(final Arguments args)
+  {
+    return null;
+  }
+
+  public T visit(final This t)
   {
     return null;
   }

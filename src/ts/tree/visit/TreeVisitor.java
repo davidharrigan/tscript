@@ -64,8 +64,12 @@ public interface TreeVisitor<T>
 
   T visit(NewExpression newExpression);
 
+  T visit(MemberExpression memberExpression);
+
   T visit(PropertyAccessor propertyAccessor);
 
   T visit(Arguments args);
+
+  T visit(This t);
 }
 

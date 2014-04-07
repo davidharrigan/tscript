@@ -37,7 +37,7 @@ public abstract class TSEnvironmentRecord
   abstract TSBoolean deleteBinding(TSString name);
 
   /** Return the implicit "this" value for this environment. */
-  abstract TSValue implicitThisValue();
+  public abstract TSObject implicitThisValue();
 
   abstract void createImmutableBinding(TSString name);
   

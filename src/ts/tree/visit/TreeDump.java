@@ -303,6 +303,19 @@ public final class TreeDump extends TreeVisitorBase<Object>
       visitNode(newExpression.getExpression());
     indentation -= increment;
     return null;
+  }  
+
+  public Object visit(final MemberExpression memberExpression)
+  {
+    indent();
+    writer.println("MemberExpression");
+    indentation += increment;
+    if (memberExpression.getArguments() != null)
+      visitEach(memberExpression.getArguments());
+    if (memberExpression.getExpression() != null)
+      visitNode(memberExpression.getExpression());
+    indentation -= increment;
+    return null;
   }
 
   public Object visit(final PropertyAccessor p)
@@ -323,6 +336,13 @@ public final class TreeDump extends TreeVisitorBase<Object>
     indentation += increment;
     visitEach(a.getArgumentList());
     indentation -= increment;
+    return null;
+  }
+
+  public Object visit(final This t)
+  {
+    indent();
+    writer.println("This");
     return null;
   }
 }

@@ -18,6 +18,7 @@ var Y;
 Y = new F();
 Y.prototype = x;
 
+
 // finally, use the constructor to create another object, whose internal
 // protoptype will be set to the prototype object
 var z;

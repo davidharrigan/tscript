@@ -321,10 +321,11 @@ public class TreeBuilder
    */
   public static Expression buildFunctionExpression(final Location loc, 
       final String name,
-      final List<Statement> statement)
+      final List<Statement> statement,
+      final List<String> parameterList)
   {
     Message.log("TreeBuilder: buildFunctionExpression");
-    return new FunctionExpression(loc, name, statement);
+    return new FunctionExpression(loc, name, statement, parameterList);
   }
 
   /** Build a Function Call
@@ -333,10 +334,10 @@ public class TreeBuilder
    *  @param  expression  expression sub tree
    */
   public static Expression buildFunctionCall(final Location loc,
-      final Expression expression)
+      final Expression expression, final Arguments args)
   {
     Message.log("TreeBuilder: buildFunctionCall");
-    return new FunctionCall(loc, expression);
+    return new FunctionCall(loc, expression, args);
   }
 
   /** Build a Return Statement
@@ -357,11 +358,25 @@ public class TreeBuilder
    * @param expression  expression sub tree
    */ 
   public static Expression buildNewExpression(final Location loc,
-    final Expression expression, final boolean isMember)
+    final Expression expression)
   {
     Message.log("TreeBuilder: buildNewExpression");
-    return new NewExpression(loc, expression, isMember);
+    return new NewExpression(loc, expression);
   }
+
+  /** Build a Member Expression
+   *
+   * @param loc         location in source code (file, line, column)
+   * @param expression  expression sub tree
+   * @param arguments   arguments
+   */
+  public static Expression buildMemberExpression(final Location loc,
+    final Expression expression, final Arguments arguments)
+  {
+    Message.log("TreeBuilder: buildMemberExpression");
+    return new MemberExpression(loc, expression, arguments);
+  }
+
 
   /** Build a Property Accessor
    *
@@ -383,11 +398,21 @@ public class TreeBuilder
    * @param loc     location in source code (file, line, column)
    * @param argList argument list
    */
-  public static Expression buildArguments(final Location loc,
+  public static Arguments buildArguments(final Location loc,
     final List<Expression> argList)
   {
     Message.log("TreeBuilder: buildArguments");
     return new Arguments(loc, argList);
+  }
+
+  /** Build this
+   *
+   * @param loc   location in source code (file, line, column)
+   */
+  public static Expression buildThis(final Location loc)
+  {
+    Message.log("TreeBuilder: buildThis");
+    return new This(loc);
   }
 
   //

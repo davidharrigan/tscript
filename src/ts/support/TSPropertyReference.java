@@ -12,27 +12,33 @@ public class TSPropertyReference extends TSReference
 		this.base = (TSObject) base;
 	}
 
+	public TSObject getObjectBase() {
+		return base;
+	}
+
 	public boolean isPropertyReference() {
 		return true;
 	}
 
 	public boolean isUnresolvableReference() {
-		return false;
-	}
-
-	public TSValue getBase() {
-		return base;
+		return (base instanceof TSUndefined);
 	}
 
 	public TSValue getValue() {
+		// might have to look at this again 
+		// 8.7.1
 		return base.getProperty(this.name);
 	}
 
-	// pass global in later
 	public void putValue(TSValue value) {
-		base.putProperty(name, value);
+		if (isUnresolvableReference()) {
+			TSEnvironmentRecord.global.putProperty(this.getReferencedName(), 
+				value);
+		}
+		else {
+			base.putProperty(name, value);
+		}
 	}
-
 
 	protected TSPrimitive getPrimitive()
 	{

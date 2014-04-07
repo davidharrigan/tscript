@@ -7,21 +7,21 @@ import java.util.HashMap;
 final class TSObjectEnvironmentRecord extends TSEnvironmentRecord
 {
 	private final TSObject bindingObject;
-	private final Map<TSString, TSBinding> map;
+	private final boolean provideThis;
 
 	/** Create a object environment record by creating a HashMap to
 	 *  to connect names to their bindings
 	 *  
 	 *  @see TSBinding
 	 */
-	TSObjectEnvironmentRecord(TSObject bindingObject)
+	TSObjectEnvironmentRecord(TSObject bindingObject, boolean provideThis)
 	{
-		map = new HashMap<TSString, TSBinding>(10);
-		this.bindingObject = bindingObject; 
+		this.bindingObject = bindingObject;
+		this.provideThis = provideThis; 
 	}
 
 	/** Does the environment have a binding for the given name? */
-  	boolean hasBinding(final TSString name)
+  boolean hasBinding(final TSString name)
  	{
  		return bindingObject.hasProperty(name);
  	}
@@ -31,7 +31,7 @@ final class TSObjectEnvironmentRecord extends TSEnvironmentRecord
      */
   	void createMutableBinding(final TSString name, final boolean isDeletable)
   	{
-    	assert(bindingObject.hasProperty(name) == true) : "binding already exists";
+    	assert(bindingObject.hasProperty(name) == false) : "binding already exists";
     	bindingObject.putProperty(name, TSUndefined.value);
   	}
 
@@ -61,8 +61,11 @@ final class TSObjectEnvironmentRecord extends TSEnvironmentRecord
   	}
 
   
-  	TSValue implicitThisValue()
+  	public TSObject implicitThisValue()
   	{
+  		if (provideThis) {
+  			return bindingObject;
+  		}
     	return TSUndefined.value;
   	}
 

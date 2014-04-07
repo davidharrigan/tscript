@@ -293,15 +293,15 @@ newExpression
   : m=memberExpression
     { $lval = $m.lval; }
   | 'new' n=newExpression
-    { $lval = buildNewExpression(loc($start), $n.lval, false); }
+    { $lval = buildNewExpression(loc($start), $n.lval); }
   ;
 
 callExpression
   returns [ Expression lval ]
-  : m=memberExpression arguments
-    { $lval = buildFunctionCall(loc($start), $m.lval); }
-  | c=callExpression arguments
-    { $lval = buildFunctionCall(loc($start), $m.lval); } // check this later
+  : m=memberExpression a=arguments
+    { $lval = buildFunctionCall(loc($start), $m.lval, $a.lval); }
+  | c=callExpression a=arguments
+    { $lval = buildFunctionCall(loc($start), $m.lval, $a.lval); } // check this later
   | c=callExpression '.' IDENTIFIER
     { $lval = buildPropertyAccessor(loc($start), $c.lval, $IDENTIFIER.text); }
   ;
@@ -314,24 +314,38 @@ memberExpression
     { $lval = $f.lval; }
   | m=memberExpression '.' IDENTIFIER
     { $lval = buildPropertyAccessor(loc($start), $m.lval, $IDENTIFIER.text); }
-  | 'new' m=memberExpression arguments
-    { $lval = buildNewExpression(loc($start), $m.lval, true); }
+  | 'new' m=memberExpression a=arguments
+    { $lval = buildMemberExpression(loc($start), $m.lval, $a.lval); }
   ;
 
 functionExpression
   returns [ Expression lval ]
   : 'function' LPAREN RPAREN '{' f=functionBody '}'
-    { $lval = buildFunctionExpression(loc($start), null, $f.lval); }
+    { $lval = buildFunctionExpression(loc($start), null, $f.lval, null); }
   | 'function' IDENTIFIER LPAREN RPAREN '{' f=functionBody '}'
-    { $lval = buildFunctionExpression(loc($start), $IDENTIFIER.text, $f.lval); }
-
-  //| 'function' LPAREN formalParameterList RPAREN '{' functionBody '}'
-  //| 'function' IDENTIFIER LPAREN formalParameterList RPAREN '{' functionBody '}'
+    { $lval = buildFunctionExpression(loc($start), $IDENTIFIER.text, $f.lval, null); }
+  | 'function' LPAREN fL=formalParameterList RPAREN '{' f=functionBody '}'
+    { $lval = buildFunctionExpression(loc($start), null, $f.lval, $fL.lval); }
+  | 'function' IDENTIFIER LPAREN fL=formalParameterList RPAREN '{' f=functionBody '}'
+    { $lval = buildFunctionExpression(loc($start), $IDENTIFIER.text, $f.lval, $fL.lval); }
   ;
 
+formalParameterList
+  returns [ List<String> lval ]
+  : { $lval = new ArrayList<String>(); }
+  | IDENTIFIER
+    { $lval.add($IDENTIFIER.text); }
+  | f=formalParameterList IDENTIFIER
+      { for (int i=0; i<$f.lval.size(); i++){
+        $f.lval.add($f.lval.get(i));
+      }
+      $f.lval.add($IDENTIFIER.text);
+      $lval = $f.lval;
+    }
+  ;
 
 arguments
-  returns [ Expression lval ] 
+  returns [ Arguments lval ] 
   : LPAREN RPAREN
   | LPAREN a=argumentList RPAREN
     { $lval = buildArguments(loc($start), $a.lval); }
@@ -339,14 +353,15 @@ arguments
 
 argumentList
   returns [ List<Expression> lval ]
-  : { $lval = new ArrayList<Expression>(); } 
-  | ae=assignmentExpression
-    { $lval.add($ae.lval); }
+  : ae=assignmentExpression
+    { $lval = new ArrayList<Expression>();
+      $lval.add($ae.lval); }
   | al=argumentList COMMA ae=assignmentExpression
-    { $lval.add($ae.lval); 
-      for (Expression e: $al.lval) {
-        $lval.add(e);
+    { for (int i=0; i<$al.lval.size(); i++) {
+        $al.lval.add($al.lval.get(i));
       }
+      $al.lval.add($ae.lval);
+      $lval = $al.lval;
     }
   ;
 
@@ -428,7 +443,9 @@ multiplicativeExpression
 // ------------------------------------------------------------------
 primaryExpression
   returns [ Expression lval ]
-  : IDENTIFIER
+  : 'this'
+    { $lval = buildThis(loc($start));}
+  | IDENTIFIER
     { $lval = buildIdentifier(loc($start), $IDENTIFIER.text); }
   | NUMERIC_LITERAL
     { $lval = buildNumericLiteral(loc($start), $NUMERIC_LITERAL.text); }

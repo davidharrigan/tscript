@@ -10,10 +10,8 @@ import ts.tree.visit.TreeVisitor;
 public final class NewExpression extends Expression
 {
 	private Expression expression;
-	private boolean isMember;
 
-	public NewExpression(final Location loc, final Expression expression, 
-		final boolean isMember)
+	public NewExpression(final Location loc, final Expression expression)
 	{  
 		super(loc);
 		this.expression = expression;
@@ -22,10 +20,6 @@ public final class NewExpression extends Expression
 	public Expression getExpression()
 	{
 		return this.expression;
-	}
-
-	public boolean isMember() {
-		return isMember;
 	}
 
 	public <T> T apply(TreeVisitor<T> visitor) 

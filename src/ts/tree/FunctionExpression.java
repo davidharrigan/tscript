@@ -15,12 +15,15 @@ public final class FunctionExpression extends Expression
 {
 	private String name;
 	private List<Statement> body;
+	private List<String> parameterList;
 
-	public FunctionExpression(final Location loc, final String name, final List<Statement> body) 
+	public FunctionExpression(final Location loc, final String name, 
+		final List<Statement> body, final List<String> parameterList) 
 	{
 		super(loc);
 		this.name = name;
 		this.body = body;
+		this.parameterList = parameterList; 
 	}
 
 	public String getName() 
@@ -31,6 +34,11 @@ public final class FunctionExpression extends Expression
 	public List<Statement> getBody() 
 	{
 		return this.body;
+	}
+
+	public List<String> getParameterList() 
+	{
+		return this.parameterList;
 	}
 
 	public <T> T apply(TreeVisitor<T> visitor)

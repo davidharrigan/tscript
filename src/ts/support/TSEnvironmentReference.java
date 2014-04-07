@@ -19,44 +19,29 @@ final class TSEnvironmentReference extends TSReference
     this.base = base;
   }
 
+  public TSEnvironmentRecord getRecordBase() {
+    return base;
+  }
+
   /** Is the reference not resolvable? That is, is the name not defined
    *  in the environment?
    */
-  boolean isUnresolvableReference()
-  {
-    // base is always defined for environment reference
-    // TODO: well it should be. but we don't support property references yet.
-    //       so right now the base is null if the identifier is not defined.
-    // TSLexicalEnvironment.getIdentifierReference creates a property descriptor
-    // with an undefined base if the identifier cannot be resolved.
-    //return false;
-    return base == null;
+  public boolean isUnresolvableReference() {
+    return (base == null);
   }
 
   /** Environment references cannot be property references so this always
    *  returns false.
    */
-  boolean isPropertyReference()
+  public boolean isPropertyReference()
   {
     return false;
   }
 
-  //
-  // operations on References in expressions
-  //   must be public because they override public methods
-  // TODO: for now base is null to indicate the identifier is not declared,
-  //       which we treat now as an error
-
   /** Get the value from the Reference. Issues an error and
    *  returns null if the name is not defined.
    */
-  public TSValue getValue()
-  {
-    if (base == null)
-    {
-      Message.evaluationError("undefined identifier: " +
-        this.getReferencedName().getInternal());
-    }
+  public TSValue getValue() {
     return base.getBindingValue(this.getReferencedName());
   }
 

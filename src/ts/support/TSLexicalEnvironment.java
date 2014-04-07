@@ -44,6 +44,11 @@ public final class TSLexicalEnvironment
     environmentRecord.initializeImmutableBinding(TSString.create(name), value);
   }
 
+  public boolean hasBinding(String name) 
+  {
+    return environmentRecord.hasBinding(TSString.create(name));
+  }
+
   /** Create a Reference
    *  (<a href="http://www.ecma-international.org/ecma-262/5.1/#sec-8.7">ELS
    *  8.7</a>)
@@ -59,13 +64,7 @@ public final class TSLexicalEnvironment
     {
       if (outerEnvironment == null)
       {
-        // this is not correct
-        // it should create a property reference with an undefined base
-        // but we don't have properties yet
-        // setting the base of an environment reference to null to indicate
-        // that the identified is not declared
-        // TODO: fix this when properties are being supported
-        return new TSEnvironmentReference(name, null);
+        return new TSPropertyReference(name, TSUndefined.value);
       }
       return outerEnvironment.getIdentifierReference(name);
     }
@@ -154,7 +153,7 @@ public final class TSLexicalEnvironment
   public static TSLexicalEnvironment newObjectEnvironment(
     final TSObject object, final TSLexicalEnvironment outer)
   {
-    return new TSLexicalEnvironment(new TSObjectEnvironmentRecord(object),
+    return new TSLexicalEnvironment(new TSObjectEnvironmentRecord(object, true),
       outer);
   }
 

@@ -47,6 +47,7 @@ if (isNaN(x))
 }
 
 x = readln();
+print(x);
 while (x)
 {
   print (x);

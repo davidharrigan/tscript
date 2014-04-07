@@ -4,6 +4,8 @@ package ts.support;
 
 import ts.Message;
 
+import java.util.List;
+
 /**
  * The super class for all Tscript values.
  */
@@ -441,10 +443,19 @@ public abstract class TSValue
     return false;
   }
 
-  // If this is not overrided, its not callable
   public TSCompletion call() {
+    assert false: "shoul be overwritten";
+    return TSCompletion.createNormalNull();
+  }
+
+  // If this is not overrided, its not callable
+  public TSCompletion call(TSObject thisValue, List<TSValue> l) {
     assert false : "should be overwritten";
     return TSCompletion.createNormalNull();
+  }
+
+  public boolean isReference() {
+    return false;
   }
 
   public boolean isCallable() {

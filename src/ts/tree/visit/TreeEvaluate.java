@@ -20,20 +20,22 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
   // TODO: change to an environment for the global object
   private TSLexicalEnvironment environment;
   private TSLexicalEnvironment globalEnvironment;
+  private TSObject thisBinding;
 
   public TreeEvaluate()
   {
    // TSEnvironmentRecord.global = TSLexicalEnvironment.newObjectEnvironment(null);
-    globalEnvironment = TSLexicalEnvironment.newObjectEnvironment(
-      TSEnvironmentRecord.global, null);
-    environment = TSLexicalEnvironment.newDeclarativeEnvironment(globalEnvironment);
+    thisBinding = TSEnvironmentRecord.global;
+    environment = TSLexicalEnvironment.newObjectEnvironment(
+      thisBinding, null);
 
     labelStack.push("");
   }
 
-  public TreeEvaluate(TSLexicalEnvironment env)
+  public TreeEvaluate(TSLexicalEnvironment env, TSObject thisBinding)
   {
     environment = env;
+    this.thisBinding = thisBinding;
 
     labelStack.push("");
   }
@@ -483,15 +485,31 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
   {
     TSCompletion ref = visitNode(functionCall.getExpression());
     TSValue func = ref.getValue();
-    TSString typeError = TSString.create("TypeError");
+    TSObject thisValue;
+    List<TSValue> argList = new ArrayList<TSValue>();
+    for (Expression e: functionCall.getArguments()) {
+      argList.add(visitNode(e).getValue());
+    }
 
-    if (!(func instanceof TSObject) || !func.isCallable()) 
-    {
+    if (!(func instanceof TSObject) || !func.isCallable()) {
+      TSString typeError = TSString.create("TypeError");
       Message.setLocation(functionCall.getLoc());
       return TSCompletion.create(TSCompletionType.Throw, typeError, null);
     }
-   
-    return func.getValue().call();
+
+    if (func.isReference()) {
+      if (((TSReference)func).isPropertyReference()) {
+        thisValue = ((TSReference)func).getObjectBase();
+      } 
+      else {
+        thisValue = ((TSReference)func).getRecordBase().implicitThisValue();
+      }
+    }
+    else {
+      thisValue = TSUndefined.value;
+    }
+
+    return func.getValue().call(thisValue, argList);
   }
 
   // Function Expression
@@ -500,14 +518,16 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
   {
     String name = functionExpression.getName();
     List<Statement> body = functionExpression.getBody();
+    List<String> parameterList = functionExpression.getParameterList();
 
     if (name == null)
-      return TSCompletion.createNormal(TSFunctionObject.create(name, body, this.environment));
+      return TSCompletion.createNormal(TSFunctionObject.create(name, body, 
+        parameterList, this.environment));
 
     TSLexicalEnvironment funcEnv = TSLexicalEnvironment.newDeclarativeEnvironment(this.environment);
     
     funcEnv.createImmutableBinding(name);
-    TSFunctionObject closure = TSFunctionObject.create(name, body, funcEnv);
+    TSFunctionObject closure = TSFunctionObject.create(name, body, parameterList, funcEnv);
     funcEnv.initializeImmutableBinding(name, closure);
 
     return TSCompletion.createNormal(closure);
@@ -525,6 +545,7 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
     return TSCompletion.create(TSCompletionType.Return, expRef.getValue(), null);
   }
 
+  /*
   //  New Expression
   // ----------------------------------------------------------------
   public TSCompletion visit(final NewExpression newExpression)
@@ -532,13 +553,13 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
     TSValue ref = visitNode(newExpression.getExpression()).getValue();
     TSValue constructor = ref.getValue();
 
-    /*
+   /*
     if (!(constructor instanceof TSObject)) {
       TSString typeError = TSString.create("TypeError");
       Message.setLocation(newExpression.getLoc());
       return TSCompletion.create(TSCompletionType.Throw, typeError, null);
     }
-    */
+   
 
     if (constructor instanceof TSObject) {    
       TSValue prototype = ((TSObject) constructor).getProperty(TSString.create("prototype"));
@@ -546,6 +567,45 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
         return TSCompletion.createNormal(TSObject.create((TSObject) prototype));
     }
     return TSCompletion.createNormal(TSObject.create());
+  }
+  */
+
+  // New Expression
+  // ----------------------------------------------------------------
+  public TSCompletion visit(final NewExpression newExpression)
+  {
+    TSValue ref = visitNode(newExpression.getExpression()).getValue();
+    TSValue constructor = ref.getValue();
+
+    if (!(constructor instanceof TSObject)) {
+      TSString typeError = TSString.create("TypeError");
+      Message.setLocation(newExpression.getLoc());
+      return TSCompletion.create(TSCompletionType.Throw, typeError, null);
+    }
+
+    TSObject obj = ((TSObject)constructor).construct();
+    return TSCompletion.createNormal(obj);
+  }
+
+  // Memeber Expression
+  // ----------------------------------------------------------------
+  public TSCompletion visit(final MemberExpression memberExpression)
+  {
+    TSValue ref = visitNode(memberExpression.getExpression()).getValue();
+    TSValue constructor = ref.getValue();
+    List<TSValue> argList = new ArrayList<TSValue>();
+    for (Expression e: memberExpression.getArguments()) {
+      argList.add(visitNode(e).getValue());
+    }
+
+    if (!(constructor instanceof TSObject)) {
+      TSString typeError = TSString.create("TypeError");
+      Message.setLocation(memberExpression.getLoc());
+      return TSCompletion.create(TSCompletionType.Throw, typeError, null);
+    }
+
+    TSObject obj = ((TSObject)constructor).construct(argList);
+    return TSCompletion.createNormal(obj);
   }
 
   // Property Accessor
@@ -566,5 +626,13 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
 
     return TSCompletion.createNormal(reference);
   }
+
+  // This
+  // ----------------------------------------------------------------
+  public TSCompletion visit(final This thisValue)
+  {
+    return TSCompletion.createNormal(thisBinding);
+  }
+
 }
 

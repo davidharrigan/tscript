@@ -28,11 +28,14 @@ public abstract class TSReference extends TSObject
     return name;
   }
 
+  public TSObject getObjectBase(){ return null; }
+  public TSEnvironmentRecord getRecordBase(){ return null; };
+
   /** Is it a property reference? */
-  abstract boolean isPropertyReference();
+  public abstract boolean isPropertyReference();
 
   /** Is it a unresolvable reference (not defined)? */
-  abstract boolean isUnresolvableReference();
+  public abstract boolean isUnresolvableReference();
 
   //
   // the following are methods that are inherited from TSValue
@@ -70,6 +73,10 @@ public abstract class TSReference extends TSObject
   public final boolean isUndefined()
   {
     return this.getValue().isUndefined();
+  }
+
+  public boolean isPrimitive() {
+    return this.getValue().isPrimitive();
   }
 
   public final boolean isReference() 
