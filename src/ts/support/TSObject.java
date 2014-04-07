@@ -109,7 +109,7 @@ public class TSObject extends TSValue
 			TSValue valueOf = getProperty(VALUEOF);
 			if (valueOf.isCallable()) {
 				TSValue val = valueOf.call(this, null).getValue();
-				
+
 				if (val.isPrimitive()) {
 					return val;
 				}
@@ -123,7 +123,7 @@ public class TSObject extends TSValue
 			}
 			
 		}
-		//System.out.println("TypeError in get DefaultValue");
+		System.out.println("TypeError in get DefaultValue");
 		return TSUndefined.value;
 	}	
 

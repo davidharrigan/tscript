@@ -35,6 +35,13 @@ public final class TSCompletion
 
   private static TSCompletion normalNull = createNormal(null);
 
+  /** Create a type error completion */
+  public static TSCompletion createTypeError() 
+  {
+    return new TSCompletion(TSCompletionType.Throw, 
+      TSString.create("TypeError"), null);
+  }
+
   /** Create a normal completion type with a null value. */
   public static TSCompletion createNormalNull()
   {

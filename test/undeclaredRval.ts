@@ -8,5 +8,8 @@ var abc;
 
 def = 5;
 
+print(def);
+print(abc);
+
 print abc + def;
 

@@ -269,6 +269,14 @@ public final class TreeDump extends TreeVisitorBase<Object>
     writer.println("FunctionExpression " + n);
     indentation += increment;
     visitEach(functionExpression.getBody());
+    List<String> paramList = functionExpression.getParameterList();
+    if (paramList != null) {
+      writer.println("ParameterList");
+      for (String s: paramList) {
+        indent();
+        writer.println(s);
+      }
+    }
     indentation -= increment;
     return null;
   }
@@ -279,6 +287,7 @@ public final class TreeDump extends TreeVisitorBase<Object>
     writer.println("FunctionCall");
     indentation += increment;
     visitNode(functionCall.getExpression());
+    visitEach(functionCall.getArguments());
     indentation -= increment;
     return null;
   }
