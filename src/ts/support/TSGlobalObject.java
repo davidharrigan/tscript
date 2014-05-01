@@ -31,9 +31,15 @@ public class TSGlobalObject extends TSObject
 		global.putProperty(TSString.create("isFinite"), new GOisFinite());
 		global.putProperty(TSString.create("readln"), new GOreadln());
 		global.putProperty(TSString.create("testThis"), new GOtestThis());
+        global.putProperty(TSString.create("substring"), new Substring());
+        global.putProperty(TSString.create("indexOf"), new IndexOf());
+        global.putProperty(TSString.create("length"), new Length());
 		return global;
 	}
 
+    /**
+     * Global object built-in isNaN function
+     */
 	static class GOisNaN extends TSFunctionObject {
 		public GOisNaN() {
 			super("isNaN", null, null, null);
@@ -48,6 +54,9 @@ public class TSGlobalObject extends TSObject
 		}
 	}
 
+    /**
+     * Global object built-in isFinite function
+     */
 	static class GOisFinite extends TSFunctionObject {
 		public GOisFinite() {
 			super("isFinite", null, null, null);
@@ -63,6 +72,9 @@ public class TSGlobalObject extends TSObject
 		}
 	}
 
+    /** 
+     * Global object built-in readln function which reads from stdin
+     */ 
 	static class GOreadln extends TSFunctionObject {
 		public GOreadln() {
 			super("readln", null, null, null);
@@ -86,6 +98,10 @@ public class TSGlobalObject extends TSObject
 		}
 	}
 
+    /** 
+     * Global object built-in function that tests prototype
+     * inheritance
+     */
 	static class GOtestThis extends TSFunctionObject {
 		public GOtestThis() {
 			super("testThis", null, null, null);
@@ -112,4 +128,77 @@ public class TSGlobalObject extends TSObject
 			}
 		}
 	}
+
+    /**
+     * Built-in substring function
+     */
+    static class Substring extends TSFunctionObject {
+
+        public Substring() {
+            super("substring", null, null, null);
+        }
+
+        public TSCompletion call(TSObject thisValue, List<TSValue> args) {
+            if (args.size() < 2) {
+                return TSCompletion.createNormal(TSString.create(""));
+            }
+            
+            String str   = args.get(0).toStr().getInternal(); int start = (int)args.get(1).toNumber().getInternal();
+            int end;
+            start = (start < 0) ? 0 : start;
+            if (args.size() > 2) {
+                end = (int)args.get(2).toNumber().getInternal();
+                if (end > str.length() || end < start) {
+                    end = str.length();
+                }
+            }
+            else { 
+                end = str.length();
+            }
+
+            String result = str.substring(start, end);
+            return TSCompletion.createNormal(TSString.create(result));
+        }
+    }
+
+    /**
+     * Built-in string indexOf function
+     */
+    static class IndexOf extends TSFunctionObject {
+        
+        public IndexOf() {
+            super("indexOf", null, null, null);
+        }
+
+        public TSCompletion call(TSValue thisValue, List<TSValue> args) {
+            if (args.size() < 2) {
+                return TSCompletion.createNormal(TSNumber.create(-1));
+            }
+
+            String str = args.get(0).toStr().getInternal();
+            String sub = args.get(1).toStr().getInternal();
+            int result = str.indexOf(sub);
+            return TSCompletion.createNormal(TSNumber.create(result));
+        }
+    }
+
+    /**
+     * Built-in string length function
+     */
+    static class Length extends TSFunctionObject {
+        
+        public Length() {
+            super("length", null, null, null); 
+        }
+
+        public TSCompletion call(TSObject thisValue, List<TSValue> args) {
+            if (args.size() < 1) {
+                return TSCompletion.createNormal(TSNumber.create(0));
+            }
+
+            String str = args.get(0).toStr().getInternal();
+            int result = str.length();
+            return TSCompletion.createNormal(TSNumber.create(result));
+        }
+    }
 } 
