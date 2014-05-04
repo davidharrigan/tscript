@@ -450,8 +450,9 @@ public abstract class TSValue
 
   // If this is not overrided, its not callable
   public TSCompletion call(TSObject thisValue, List<TSValue> l) {
-    assert false : "should be overwritten";
-    return TSCompletion.createNormalNull();
+    //System.out.println(thisValue.toStr());
+    //assert false : "should be overwritten";
+    return TSCompletion.createNormal(TSUndefined.value);
   }
 
   public boolean isReference() {

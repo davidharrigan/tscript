@@ -354,5 +354,19 @@ public final class TreeDump extends TreeVisitorBase<Object>
     writer.println("This");
     return null;
   }
+
+  public Object visit(final ArrayLiteral a) 
+  {
+    indent();
+    writer.println("ArrayLiteral");
+    return null;
+  }
+
+  public Object visit(final ArrayAccessor a) 
+  {
+    indent();
+    writer.println("Array Accessor");
+    return null;
+  }
 }
 

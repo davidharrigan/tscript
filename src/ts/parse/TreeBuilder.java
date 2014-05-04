@@ -415,6 +415,33 @@ public class TreeBuilder
     return new This(loc);
   }
 
+  /** Build array literal
+   *
+   * @param loc       location in source code (file, line, column)
+   * @param elements  elements in the array (can be null)
+   */
+  public static Expression buildArrayLiteral(final Location loc, 
+    final List<Expression> elements) 
+  {
+    Message.log("TreeBuilder: buildArrayLiteral");
+    return new ArrayLiteral(loc, elements);
+  }
+
+  /** Build an Array Accessor
+   *
+   *
+   * @param loc         location in source code (file, line, column)
+   * @param expression  expression sub tree
+   * @param element     element we're trying to access
+   */
+  public static Expression buildArrayAccessor(final Location loc,
+    final Expression expression, final Expression element)
+  {
+    Message.log("TreeBuilder: buildPropertyAccessor");
+    return new ArrayAccessor(loc, expression, element);
+  }
+
+
   //
   // methods to detect "early" (i.e. semantic) errors
   //

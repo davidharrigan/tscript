@@ -11,7 +11,7 @@ import java.util.HashMap;
  */ 
 public class TSObject extends TSValue
 {
-	private final Map<TSString, TSValue> properties; 
+	protected final Map<TSString, TSValue> properties; 
 	protected TSObject prototype = null;
 
 	private static final TSString TOSTRING = TSString.create("toString");
@@ -23,7 +23,7 @@ public class TSObject extends TSValue
 	 */
 	protected TSObject()
 	{
-		this.prototype = null;
+		this.prototype = TSNull.nullValue;
 		this.properties = new HashMap<TSString, TSValue>();
 	}
 
@@ -35,7 +35,7 @@ public class TSObject extends TSValue
 
 	public static TSObject create() 
 	{
-		return new TSObject(null);
+		return new TSObject(TSNull.nullValue);
 	}
 
 	public static TSObject create(TSObject prototype)
@@ -109,14 +109,13 @@ public class TSObject extends TSValue
 			TSValue valueOf = getProperty(VALUEOF);
 			if (valueOf.isCallable()) {
 				TSValue val = valueOf.call(this, null).getValue();
-
 				if (val.isPrimitive()) {
 					return val;
 				}
 			}
 			TSValue toString = getProperty(TOSTRING);
 			if (toString.isCallable()) {
-				TSValue str = valueOf.call(this, null).getValue();
+				TSValue str = toString.call(this, null).getValue();
 				if (str.isPrimitive()) {
 					return str;
 				}

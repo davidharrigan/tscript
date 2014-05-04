@@ -34,6 +34,7 @@ public class TSGlobalObject extends TSObject
         global.putProperty(TSString.create("substring"), new Substring());
         global.putProperty(TSString.create("indexOf"), new IndexOf());
         global.putProperty(TSString.create("length"), new Length());
+        global.putProperty(TSString.create("split"), new Split());
 		return global;
 	}
 
@@ -200,5 +201,44 @@ public class TSGlobalObject extends TSObject
             int result = str.length();
             return TSCompletion.createNormal(TSNumber.create(result));
         }
+    }
+
+    /** 
+     * Built-in string split function
+     */
+    static class Split extends TSFunctionObject {
+    	public Split() {
+    		super("split", null, null, null);
+    	}
+
+    	public TSCompletion call(TSObject thisValue, List<TSValue> args) {
+    		if (args.size() < 1) {
+    			return TSCompletion.createNormal(TSUndefined.value);
+    		}
+
+    		String str = args.get(0).toStr().getInternal();
+    		TSArray result = TSArray.create();
+    		
+    		if (args.size() == 1) {
+    			result.push(TSString.create(str));
+    		}
+    		else {
+    			String regex = args.get(1).toStr().getInternal();
+    			String[] split;
+
+    			if (args.size() > 2) {
+    				int limit = (int) args.get(2).toNumber().getInternal();
+    				split = str.split(regex, limit);
+    			} 
+    			else {
+    				split = str.split(regex);
+    			}
+
+    			for (String s: split) {
+    				result.push(TSString.create(s));
+    			}
+    		}
+    		return TSCompletion.createNormal(result);
+    	}
     }
 } 

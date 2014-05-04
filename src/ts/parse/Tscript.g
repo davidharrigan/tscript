@@ -302,6 +302,8 @@ callExpression
     { $lval = buildFunctionCall(loc($start), $m.lval, $a.lval); }
   | c=callExpression a=arguments
     { $lval = buildFunctionCall(loc($start), $m.lval, $a.lval); } // check this later
+  | c=callExpression LBRACK e=expression RBRACK
+    { $lval = buildArrayAccessor(loc($start), $c.lval, $e.lval); }
   | c=callExpression '.' IDENTIFIER
     { $lval = buildPropertyAccessor(loc($start), $c.lval, $IDENTIFIER.text); }
   ;
@@ -314,6 +316,8 @@ memberExpression
     { $lval = $f.lval; }
   | m=memberExpression '.' IDENTIFIER
     { $lval = buildPropertyAccessor(loc($start), $m.lval, $IDENTIFIER.text); }
+  | m=memberExpression LBRACK e=expression RBRACK
+    { $lval = buildArrayAccessor(loc($start), $m.lval, $e.lval); }
   | 'new' m=memberExpression a=arguments
     { $lval = buildMemberExpression(loc($start), $m.lval, $a.lval); }
   ;
@@ -332,13 +336,11 @@ functionExpression
 
 formalParameterList
   returns [ List<String> lval ]
-  : { $lval = new ArrayList<String>(); }
-  | IDENTIFIER
-    { $lval.add($IDENTIFIER.text); }
-  | f=formalParameterList IDENTIFIER
-      { for (int i=0; i<$f.lval.size(); i++){
-        $f.lval.add($f.lval.get(i));
-      }
+  : IDENTIFIER
+    { $lval = new ArrayList<String>(); 
+      $lval.add($IDENTIFIER.text); }
+  | f=formalParameterList COMMA IDENTIFIER
+      { 
       $f.lval.add($IDENTIFIER.text);
       $lval = $f.lval;
     }
@@ -357,9 +359,7 @@ argumentList
     { $lval = new ArrayList<Expression>();
       $lval.add($ae.lval); }
   | al=argumentList COMMA ae=assignmentExpression
-    { for (int i=0; i<$al.lval.size(); i++) {
-        $al.lval.add($al.lval.get(i));
-      }
+    { 
       $al.lval.add($ae.lval);
       $lval = $al.lval;
     }
@@ -384,12 +384,12 @@ returnStatement
     { $lval = buildReturnStatement(loc($start), $e.lval); }
   ;
 
+
 /*
 functionDeclaration
   : 'function' IDENTIFIER LPAREN RPAREN '{' functionBody '}'
   | 'function' IDENTIFIER LPAREN formalParameterList RPAREN '{' functionBody '}'
   ;
-
 
 formalParameterList
   : IDENTIFIER
@@ -411,6 +411,7 @@ sourceElement
   //| functionDeclaration
   ;
 */
+
 // Additive Expression
 // ------------------------------------------------------------------
 additiveExpression
@@ -445,6 +446,8 @@ primaryExpression
   returns [ Expression lval ]
   : 'this'
     { $lval = buildThis(loc($start));}
+  | a=arrayLiteral
+    { $lval = $a.lval; }
   | IDENTIFIER
     { $lval = buildIdentifier(loc($start), $IDENTIFIER.text); }
   | NUMERIC_LITERAL
@@ -457,6 +460,28 @@ primaryExpression
     { $lval = buildNullLiteral(loc($start)); }
   | LPAREN e=expression RPAREN
     { $lval = $e.lval; }
+  ;
+
+// Array Literal
+// ------------------------------------------------------------------
+arrayLiteral
+  returns [ Expression lval ]
+  : LBRACK RBRACK
+     { $lval = buildArrayLiteral(loc($start), null); }
+  | LBRACK e=elementList RBRACK
+     { $lval = buildArrayLiteral(loc($start), $e.lval); }
+  ;
+
+elementList 
+  returns [ List<Expression> lval ]
+  : a=assignmentExpression
+    { $lval = new ArrayList<Expression>();
+      $lval.add($a.lval); }
+  | e=elementList COMMA a=assignmentExpression
+    { 
+      $e.lval.add($a.lval);
+      $lval = $e.lval;
+    } 
   ;
 
 // Relational Expression
@@ -626,6 +651,8 @@ NULL_LITERAL
 
 LPAREN : [(];
 RPAREN : [)];
+LBRACK : [\[];
+RBRACK : [\]];
 SEMICOLON : [;];
 COLON : [:];
 EQUAL : [=];

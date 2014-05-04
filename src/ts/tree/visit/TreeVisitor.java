@@ -71,5 +71,9 @@ public interface TreeVisitor<T>
   T visit(Arguments args);
 
   T visit(This t);
+
+  T visit(ArrayLiteral arrayLiteral);
+
+  T visit(ArrayAccessor arrayAccessor);
 }
 

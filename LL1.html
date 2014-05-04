@@ -1,0 +1,197 @@
+<head>
+<title> AST for LL1.ts</title>
+</head>
+<body>
+<pre>
+Program
+  Var Symbol
+  ExpressionStatement
+    ASSIGN
+      Identifier Symbol
+      FunctionExpression 
+        ExpressionStatement
+          ASSIGN
+            PropertyAccessor
+symbol
+              This
+            Identifier sym
+        ExpressionStatement
+          ASSIGN
+            PropertyAccessor
+isTerm
+              This
+            Identifier t
+ParameterList
+        sym
+        t
+  Var symbols
+  ExpressionStatement
+    ASSIGN
+      Identifier symbols
+      ArrayLiteral
+  Var non_terminals
+  ExpressionStatement
+    ASSIGN
+      Identifier non_terminals
+      ArrayLiteral
+  Var terminals
+  ExpressionStatement
+    ASSIGN
+      Identifier terminals
+      ArrayLiteral
+  Var null_deriving_terminals
+  ExpressionStatement
+    ASSIGN
+      Identifier null_deriving_terminals
+      ArrayLiteral
+  Var scan
+  ExpressionStatement
+    ASSIGN
+      Identifier scan
+      FunctionCall
+        Identifier readln
+  Var lines
+  ExpressionStatement
+    ASSIGN
+      Identifier lines
+      Identifier scan
+  WhileStatement
+    Identifier scan
+    BlockStatement
+      ExpressionStatement
+        ASSIGN
+          Identifier scan
+          FunctionCall
+            Identifier readln
+      ExpressionStatement
+        ASSIGN
+          Identifier lines
+          ADD
+            Identifier lines
+            Identifier scan
+  EmptyStatement
+  Var rows
+  ExpressionStatement
+    ASSIGN
+      Identifier rows
+      FunctionCall
+        Identifier split
+        Identifier lines
+        StringLiteral 
+
+  Var i
+  ExpressionStatement
+    ASSIGN
+      Identifier i
+      NumericLiteral 0.0
+  WhileStatement
+    LESS
+      Identifier i
+      FunctionCall
+        PropertyAccessor
+length
+          Identifier rows
+    BlockStatement
+      Var row
+      ExpressionStatement
+        ASSIGN
+          Identifier row
+          FunctionCall
+            Identifier split
+            Array Accessor
+            StringLiteral \ 
+      Var match
+      ExpressionStatement
+        ASSIGN
+          Identifier match
+          BooleanLiteral false
+      Var j
+      ExpressionStatement
+        ASSIGN
+          Identifier j
+          NumericLiteral 0.0
+      WhileStatement
+        LESS
+          Identifier j
+          FunctionCall
+            PropertyAccessor
+length
+              Identifier non_terminals
+        BlockStatement
+          IfStatement
+            EQUAL
+              Array Accessor
+              Array Accessor
+            BlockStatement
+              ExpressionStatement
+                ASSIGN
+                  Identifier match
+                  BooleanLiteral true
+              ExpressionStatement
+                ASSIGN
+                  Identifier j
+                  ADD
+                    Identifier j
+                    NumericLiteral 1.0
+          EmptyStatement
+          IfStatement
+            NOT
+              Identifier match
+            BlockStatement
+              ExpressionStatement
+                FunctionCall
+                  PropertyAccessor
+push
+                    Identifier non_terminals
+                  Array Accessor
+              Var s
+              ExpressionStatement
+                ASSIGN
+                  Identifier s
+                  MemberExpression
+                    Array Accessor
+                    BooleanLiteral false
+                    Identifier Symbol
+              PrintStatement
+                PropertyAccessor
+symbol
+                  Identifier s
+              ExpressionStatement
+                FunctionCall
+                  PropertyAccessor
+push
+                    Identifier symbols
+                  Identifier s
+              ExpressionStatement
+                ASSIGN
+                  Identifier i
+                  ADD
+                    Identifier i
+                    NumericLiteral 1.0
+          EmptyStatement
+          PrintStatement
+            Identifier non_terminals
+          ExpressionStatement
+            ASSIGN
+              Identifier i
+              NumericLiteral 0.0
+          WhileStatement
+            LESS
+              Identifier i
+              FunctionCall
+                PropertyAccessor
+length
+                  Identifier symbols
+            BlockStatement
+              PrintStatement
+                PropertyAccessor
+symbol
+                  Array Accessor
+              ExpressionStatement
+                ASSIGN
+                  Identifier i
+                  ADD
+                    Identifier i
+                    NumericLiteral 1.0
+          EmptyStatement
+</pre>

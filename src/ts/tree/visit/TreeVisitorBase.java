@@ -183,5 +183,15 @@ public class TreeVisitorBase<T> implements TreeVisitor<T>
   {
     return null;
   }
+
+  public T visit(final ArrayLiteral a) 
+  {
+    return null;
+  }
+
+  public T visit(final ArrayAccessor a) 
+  {
+    return null;
+  }
 } 
 

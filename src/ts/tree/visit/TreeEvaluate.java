@@ -634,5 +634,38 @@ public final class TreeEvaluate extends TreeVisitorBase<TSCompletion>
     return TSCompletion.createNormal(thisBinding);
   }
 
+  // ArrayLiteral
+  // ----------------------------------------------------------------
+  public TSCompletion visit(final ArrayLiteral arrayLiteral) 
+  {
+    List<TSValue> elements = new ArrayList<TSValue>();
+    for (Expression e: arrayLiteral.getElements()) {
+      elements.add(visitNode(e).getValue());
+    }
+
+    TSArray array = TSArray.create();
+    for (TSValue e: elements) {
+      array.push(e);
+    } 
+
+    return TSCompletion.createNormal(array);
+  }
+
+  // ArrayAccessor
+  // ----------------------------------------------------------------
+  public TSCompletion visit(final ArrayAccessor arrayAccessor) 
+  {
+    // Get value twice since its going to be a reference
+    TSValue val = visitNode(arrayAccessor.getExpression()).getValue().getValue();
+    if ( !(val instanceof TSArray) ) {
+      return TSCompletion.createNormal(TSUndefined.value);
+    }
+
+    TSArray array = (TSArray) val;
+    TSNumber elem = visitNode(arrayAccessor.getElement()).getValue().toNumber();
+    TSValue result = array.get(elem);
+    return TSCompletion.createNormal(result);
+  }
+
 }
 

@@ -7,6 +7,9 @@ import ts.Message;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.Iterator;
+
 /**
  * Class to represent function objets. 
  * <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-13.2">ELS 13.2</a>
@@ -124,9 +127,17 @@ public class TSFunctionObject extends TSObject
 			obj.putProperty(TSString.create("prototype"), proto);
 		}
 
+		Iterator it = properties.entrySet().iterator();
+		while (it.hasNext()) {
+			Map.Entry pairs = (Map.Entry)it.next();
+			obj.putProperty((TSString)pairs.getKey(), (TSValue)pairs.getValue());
+			System.out.println(((TSString)pairs.getKey()).getInternal());
+		}
+
 		TSValue result = call(obj, values).getValue();
-		if (result instanceof TSObject)
+		if (result instanceof TSObject) {
 			return (TSObject) result;
+		}
 		return obj;
 	}
 }
