@@ -11,11 +11,13 @@ import ts.Message;
 public class TSArray extends TSObject
 {
 	private Vector<TSValue> list; 
+	private int length;
 
 	private TSArray() 
 	{
 		super();
 		list = new Vector<TSValue>();
+		length = 0;
 	}
 
 	public static TSArray create() 
@@ -23,13 +25,16 @@ public class TSArray extends TSObject
 		TSArray array = new TSArray();
 		array.putProperty(TSString.create("push"), new Push());
 		array.putProperty(TSString.create("toString"), new ToString());
-		array.putProperty(TSString.create("length"), new Length());
+		array.putProperty(TSString.create("length"), 
+			TSNumber.create(array.list.size()));
 		array.putProperty(TSString.create("slice"), new Slice());
 		return array;
 	}
 
 	public void push(TSValue v) 
 	{
+		length++;
+		putProperty(TSString.create("length"), TSNumber.create(length));
 		this.list.add(v);
 	}
 
