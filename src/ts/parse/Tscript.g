@@ -238,8 +238,8 @@ expression
 // ------------------------------------------------------------------
 assignmentExpression
   returns [ Expression lval ]
-  : e=equalityExpression
-    { $lval = $e.lval; }
+  : c=conditionalExpression
+    { $lval = $c.lval; }
   | l=leftHandSideExpression EQUAL r=assignmentExpression
     { checkAssignmentDestination(loc($start), $l.lval);
       $lval = buildBinaryOperator(loc($start), Binop.ASSIGN,
@@ -482,6 +482,29 @@ elementList
       $e.lval.add($a.lval);
       $lval = $e.lval;
     } 
+  ;
+
+//
+conditionalExpression
+  returns [ Expression lval ]
+  : l=logicalORExpression
+    { $lval = $l.lval; }
+  ;
+
+logicalORExpression
+  returns [ Expression lval ]
+  : eq=logicalANDExpression
+    { $lval = $eq.lval; }
+  | l=logicalORExpression '||' eq=logicalANDExpression
+    { $lval = buildBinaryOperator(loc($start), Binop.LOGICAL_OR, $l.lval, $eq.lval); }
+  ;
+
+logicalANDExpression
+  returns [ Expression lval ]
+  : eq=equalityExpression
+    { $lval = $eq.lval; }
+  | l=logicalANDExpression '&&' eq=equalityExpression
+    { $lval = buildBinaryOperator(loc($start), Binop.LOGICAL_AND, $l.lval, $eq.lval); }
   ;
 
 // Relational Expression

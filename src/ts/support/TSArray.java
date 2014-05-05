@@ -36,7 +36,7 @@ public class TSArray extends TSObject
 	public TSValue get(TSNumber elem) {
 		int loc = (int) elem.getInternal();
 		
-		if (loc > list.size() || loc < 0) {
+		if (loc >= list.size() || loc < 0) {
 			return TSUndefined.value;
 		}
 

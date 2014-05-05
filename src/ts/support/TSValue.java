@@ -281,6 +281,28 @@ public abstract class TSValue
     return TSBoolean.create(abstractRelationalComparison(leftValue, rightValue, false));
   }
 
+  /** Perform a logical and comparison
+   */
+  public final TSBoolean logicalAnd(final TSValue right) {
+    boolean leftVal = this.toPrimitive().toBoolean().getInternal();
+    boolean rightVal = this.toPrimitive().toBoolean().getInternal();
+    System.out.println(leftVal + "&&" + rightVal);
+    if (leftVal == true && rightVal == true)
+      return TSBoolean.create(true);
+    return TSBoolean.create(false);
+  }
+
+
+  /** Perform a logical or comparison
+   */
+  public final TSBoolean logicalOr(final TSValue right) {
+    boolean leftVal = this.toBoolean().getInternal();
+    boolean rightVal = this.toBoolean().getInternal();
+
+    if (leftVal == true || rightVal == true)
+      return TSBoolean.create(true);
+    return TSBoolean.create(false);
+  }
 
   //
   // test for null and undefined

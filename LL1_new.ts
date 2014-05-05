@@ -8,7 +8,7 @@ var non_terminals = [];
 var null_deriving = [];
 
 //
-//
+// Symbol function to store information of each symbol
 //
 var Symbol = function(s, isTerminal) {
     this.symbol = s;
@@ -28,7 +28,7 @@ var Symbol = function(s, isTerminal) {
 };
 
 //
-//
+// Returns a Symbol object from a given string input
 //
 var getSymbol = function(s) {
     var i = 0; 
@@ -43,7 +43,7 @@ var getSymbol = function(s) {
 };
 
 //
-//
+// Returns a set of nonterminals
 //
 var getNonTerminals = function(rows) {
     var ret = [];
@@ -69,6 +69,7 @@ var getNonTerminals = function(rows) {
             j = j + 1;
         };
 
+        // we don't want any duplicates
         if (!match) {
             ret.push(new Symbol(row[0], false));
             symbols.push(new Symbol(row[0], false));
@@ -91,7 +92,7 @@ var getNonTerminals = function(rows) {
 };
 
 //
-//
+// Returns a set of null deriving nonterminals 
 //
 var getNullDeriving = function() {
     var ret = [];
@@ -107,7 +108,7 @@ var getNullDeriving = function() {
 };
 
 //
-//
+// returns a set of terminals 
 //
 var getTerminals = function(rows) {
     var ret = [];
@@ -135,6 +136,7 @@ var getTerminals = function(rows) {
                 j = j + 1;
             };
             
+            // we don't want any duplicates
             if (!match) {
                 ret.push(new Symbol(row[element], true));
             }
@@ -153,70 +155,112 @@ var getTerminals = function(rows) {
     return ret; 
 };
 
-
 //
+// Given a list of products (right hand side elements), 
+// calculates and returns the first sets of the input
 //
-//
-var getFirstSets = function() {
-    
-    // Recursive internal function
-    var getFirst = function(non_terminal_char) {
-        var i = 0; 
-        var j = 0;
-        var ret = [];
-        
-        non_terminal = getSymbol(non_terminal_char);
+var getFirstOfProduct = function(products) {
+    var ret = [];  
+    var i = 0;
+    print products + ">>";
+    while(i < products.length()) {
+        var sym = getSymbol(products[i]);
 
-        // for each product
-        while(i < non_terminal.products.length()) {
-            j = 0;
-            while(j < non_terminal.products[i].length()) {
-                var sym = getSymbol(non_terminal.products[i][j]);
+        if (sym.isTerminal) {
+            ret.push(sym);
+            return ret;
+        }
+        else {
+            firsts = getFirst(sym.symbol);
+            var k = 0;
+            while (k < firsts.length()) {
+                var x = 0;
+                var match = false;
 
-                if (sym.isTerminal) {
-                    ret.push(sym);
-                    break;
-                }
-                else {
-                    firsts = getFirst(sym.symbol);
-                    var k = 0;
-                    while (k < firsts.length()) {
-                        var x = 0;
-                        var match = false;
-                        while (x < ret.length()) {
-                            if (ret[x].symbol == firsts[k].symbol) {
-                                match = true; 
-                            }
-                            x = x + 1;
-                        }
-                        if (!match) {
-                            ret.push(firsts[k]);
-                        }
-                        k = k + 1;
-                    }
-                    
-                    if (sym.null_deriving == false) {
+                while (x < ret.length()) {
+                    if (ret[x].symbol == firsts[k].symbol) {
+                        match = true; 
                         break;
                     }
+                    x = x + 1;
                 }
-                j = j + 1;
-            };
-            i = i + 1;
-        };
-        return ret;
-    };
 
+                if (!match) {
+                    ret.push(firsts[k]);
+                }
+                k = k + 1;
+            }
+            
+            if (sym.null_deriving == false) {
+                break;
+            }
+        }
+        i = i + 1;
+    };
+    return ret;
+};
+
+//
+// Returns a set of all first sets from a given nonterminal 
+//
+var getFirst = function(non_terminal_char) {
+    var i = 0; 
+    var j = 0;
+    var ret = [];
+    
+    non_terminal = getSymbol(non_terminal_char);
+
+    // for each product
+    while(i < non_terminal.products.length()) {
+        var result = getFirstOfProduct(non_terminal.products[i]);
+        non_terminal.products[i].first = result;
+
+        j = 0; 
+        while (j < result.length()) {
+            var k = 0;
+            var match = false;
+            while (k < ret.length()) {
+                if (result[j] == ret[k]) {
+                    match = true;
+                    break;
+                }
+                k = k + 1;
+            }
+            
+            if (!match) {
+                ret.push(result[j]);                
+            }
+            j = j + 1;
+        }
+        i = i + 1;
+    };
+    return ret;
+};
+
+//
+// Calculates first sets of all nonterminals
+//
+var getFirstSets = function() {
     var i = 0;
     var ret = []; 
     while (i < non_terminals.length()) {
         non_terminals[i].first_sets = getFirst(non_terminals[i].symbol);
+        symbol = getSymbol(non_terminals[i].symbol);
+        symbol.first_sets = non_terminals[i].first_sets;
         print non_terminals[i].toString() + ": " +  non_terminals[i].first_sets; 
         i = i + 1;
     }
 };
 
+//
+// Calculates follow sets of all nonterminals
+//
 var getFollowSets = function() {
     
+    //
+    // Recursive inner function. Returns a follow set for a 
+    // given nonterminal. 
+    //
     var getFollow = function(non_terminal_char) {
         var i = 0;
         var j = 0;
@@ -232,21 +276,24 @@ var getFollowSets = function() {
             var non_terminal = non_terminals[i];
             j = 0;
             while (j < non_terminal.products.length()) { //iterate each product sets
-                
                 k = 0;
+                var prevTarget = false;
                 while (k < non_terminal.products[j].length()) { //each item in product
                     var item = getSymbol(non_terminal.products[j][k]);
-                    if (item.symbol == target.symbol) {
+                    
+                    if ((item.symbol == target.symbol) || 
+                       (item.null_deriving && prevTarget)) {
                         var set = [];
 
                         // if it's the last element
-                        if (k == non_terminal.products[i].length()-1) {
-                            var set;
-                            if (non_terminal.follow_sets == undefined) {
-                                set = getFollow(non_terminal.symbol);
-                            } 
-                            else {
-                                set = non_terminal.follow_sets;
+                        if (k == non_terminal.products[j].length()-1) {
+                            if (!(non_terminal.symbol == item.symbol)) {
+                                if (non_terminal.follow_sets == undefined) {
+                                    set = getFollow(non_terminal.symbol);
+                                } 
+                                else {
+                                    set = non_terminal.follow_sets;
+                                }
                             }
 
                         }
@@ -276,6 +323,10 @@ var getFollowSets = function() {
                             }
                             x = x + 1;
                         }
+                        prevTarget = true;
+                    }
+                    else {
+                        prevTarget = false;
                     }
                     k = k + 1;
                 }
@@ -283,16 +334,108 @@ var getFollowSets = function() {
             }
             i = i + 1;
         }
-
         return ret;
     };
     
     var i = 0;
     while (i < non_terminals.length()) {
         non_terminals[i].follow_sets = getFollow(non_terminals[i].symbol);
+        symbol = getSymbol(non_terminals[i].symbol);
+        symbol.follow_sets = non_terminals[i].follow_sets;
         print non_terminals[i].toString() + ": " +  non_terminals[i].follow_sets; 
         i = i + 1;
     }
+};
+
+//
+// Returns a predict set for a given nonterminal
+//
+var getPredict = function(non_terminal_char) {
+    var i = 0; 
+    var ret = [];
+    non_terminal = getSymbol(non_terminal_char); 
+    
+    while (i < non_terminal.products.length()) {
+        ret.push(getFirstOfProduct(non_terminal.products[i]));
+        i = i + 1;
+    }
+
+    if (non_terminal.null_deriving) {
+        ret.push(non_terminal.follow_sets);
+    }
+    
+    return ret;
+};
+
+//
+// Calculates predict sets for all products
+//
+var getPredictSets = function() {
+    var i = 0;
+    var ret = [];
+    while (i < non_terminals.length()) {
+        non_terminals[i].predict_sets = getPredict(non_terminals[i].symbol);
+        
+        var j = 0;
+        while (j < non_terminals[i].products.length()) {
+            print non_terminals[i] + " -> " + non_terminals[i].products[j] + ":";
+            print non_terminals[i].predict_sets[j] + "\n"; 
+            j = j + 1;
+        }
+        if (non_terminals[i].null_deriving) {
+            print non_terminals[i] + " -> lambda: ";
+            print non_terminals[i].predict_sets[j] + "\n";
+        }
+
+        symbol = getSymbol(non_terminals[i].symbol);
+        symbol.predict_sets = non_terminals[i].predict_sets;
+
+        i = i + 1;
+    }
+};
+
+//
+// Checks whether the given grammar is LL(1)
+//
+var isLL1 = function() {
+    var ret = true;
+    var i = 0;
+
+    var isUniqueSet = function(non_terminal_char) {
+        var symbol = getSymbol(non_terminal_char);
+        var i = 0; 
+        var j = 0;
+
+        while (i < symbol.predict_sets.length()) {
+            j = 0; 
+            while (j < symbol.predict_sets.length()) {
+                if (!(j == i)) {
+                    var x = 0;
+                    while (x < symbol.predict_sets[i].length()) {
+                        var y = 0;
+                        while (y < symbol.predict_sets[j].length()) {
+                            if (symbol.predict_sets[i][x] == symbol.predict_sets[j][y]) {
+                                return false;
+                            }
+                            y = y + 1;
+                        }
+                        x = x + 1;
+                    }
+                }
+                j = j + 1;
+            }
+            i = i + 1; 
+        }
+        return true;
+    };
+    
+    while (i < non_terminals.length()) {
+        if (isUniqueSet(non_terminals[i].symbol) == false) {
+            return false;
+        }
+        i = i + 1;
+    }
+    return true;
 };
 
 var scan = readln();
@@ -301,6 +444,7 @@ while (scan) {
     scan = readln();
     lines = lines + scan;
 };
+
 
 rows = split(lines, '\n');
 non_terminals = getNonTerminals(rows);
@@ -331,3 +475,12 @@ getFollowSets();
 
 // Part 5
 print "\nPredict Sets";
+getPredictSets();
+
+var LL = isLL1();
+if (LL) {
+    print "\nThe grammar is LL(1)\n";
+}
+else {
+    print "\nThe grammar is NOT LL(1)\n";
+}
